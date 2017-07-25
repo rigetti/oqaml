@@ -1,7 +1,11 @@
 #require "owl";;
+(**#require "core";;*)
+#require "core_extended";;
 module M = Owl.Dense.Matrix.C;;
+module Math = Owl.Maths;;
 module V = Owl.Dense.Vector.C;;
 module C = Complex;;
+module S = Core_extended.Sampler;;
 
 type wavefunc = WF of C.t list;;
 
@@ -17,6 +21,9 @@ type gate =
   | Y of int
   | Z of int
   | H of int
+  | RX of float * int
+  | RY of float * int
+  | RZ of float * int
   | CNOT of int*int
   | SWAP of int*int
 ;;
@@ -28,9 +35,29 @@ type qvm =
     wf : V.vec;
   }
 
+let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float;;
+
+let rec _reverse_bin_rep x =
+  let rem = x mod 2 in
+  if x > 0 then rem::(_reverse_bin_rep (x / 2))
+  else [];;
+
+let rec pad_list n l =
+  let pl = [0]@l in
+  if List.length(pl) <= n then pad_list n pl
+  else l;;
+
+let rec range i j =
+  if i < j then i :: (range (i+1) j)
+  else [];;
+
+let state_list qvm =
+  let r = range 0 (int_pow 2 qvm.num_qubits) in
+  List.map (fun x -> pad_list qvm.num_qubits (_reverse_bin_rep x)) r;;
+
 let create_qvm num_qubits =
   {num_qubits = num_qubits;
-   wf = ((2. ** (float_of_int num_qubits)) |> int_of_float |> V.unit_basis) 0 |> V.transpose;
+   wf = ((int_pow 2 num_qubits) |> V.unit_basis) 0 |> V.transpose;
   }
 ;;
 
@@ -41,9 +68,17 @@ let sx = M.of_arrays [| [|C.zero;C.one|];
 let sy = M.of_arrays [| [|C.zero;C.conj C.i|];
                         [|C.i;C.zero|]|];;
 let sz = M.of_arrays [| [|C.one;C.zero|];
-                        [|C.neg C.zero;C.one|]|];;
+                        [|C.zero;C.neg C.one|]|];;
 let h = (M.of_arrays [| [|C.one; C.one|];
-                       [|C.one; C.neg C.one|] |] |> M.div_scalar) (C.sqrt{C.re=2.0; im=0.0});;
+                        [|C.one; C.neg C.one|] |] |> M.div_scalar) (C.sqrt{C.re=2.0; im=0.0});;
+
+let ct t = {C.re=Math.cos (t /. 2.0); im=0.0};;
+let ist t = {C.re=0.0; im=(Math.sin (t /. 2.0))};;
+
+let rx t = M.add (M.scalar_mul (ct t) id)  (M.scalar_mul (ist t |> C.conj) sx);;
+let ry t = M.add (M.scalar_mul (ct t) id)  (M.scalar_mul (ist t |> C.conj) sy);;
+let rz t = M.add (M.scalar_mul (ct t) id)  (M.scalar_mul (ist t |> C.conj) sz);;
+
 let swap = M.of_arrays [| [|C.one; C.zero; C.zero; C.zero |];
                           [|C.zero; C.zero; C.one; C.zero |];
                           [|C.zero; C.one; C.zero; C.zero |];
@@ -80,8 +115,6 @@ let rec _build_nn_2q_gate_list i n ql g =
 
 let tensor_up_two_q_gate n q g =
   _kron_up (_build_nn_2q_gate_list 0 n q g);;
-
-let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float;;
 
 let _multi_dot dim = List.fold_left M.dot (M.eye (int_pow 2 dim));;
 
@@ -124,9 +157,24 @@ let apply_gate i qvm =
   | Y(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x sy) qvm.wf}
   | Z(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x sz) qvm.wf}
   | H(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x h) qvm.wf}
+  | RX(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (rx t)) qvm.wf}
+  | RY(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (ry t)) qvm.wf}
+  | RZ(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (rz t)) qvm.wf}
   | CNOT(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (_build_2q_gate qvm.num_qubits x y cnot) qvm.wf}
   | SWAP(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (_build_2q_gate qvm.num_qubits x y swap) qvm.wf}
 ;;
+
+let get_probs qvm =
+  qvm.wf |> V.to_array |> Array.to_list |> (List.map (fun x -> (C.norm x) ** 2.0));;
+
+let measure qvm n =
+  let smplr = S.create (List.map2 (fun x y -> (x, y)) (state_list qvm) (get_probs qvm)) in
+  let rec sample_state smplr n i =
+    let j = i+1 in
+    if j < n then S.sample(smplr)::(sample_state smplr n j)
+    else []
+  in
+  sample_state smplr n 0;;
 
 let bool_of_int i = if i==1 then true else false;;
 let int_of_bool b = if b then 1 else 0;;
