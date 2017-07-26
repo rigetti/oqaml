@@ -3,7 +3,7 @@
 # +-------------------------------------------------------------------+
 
 OASISFormat:  0.4
-Name:         OQam
+Name:         oqam
 Version:      0.1
 Description:  OQam is a reference implementation of the Quil Language in OCaml
 Synopsis:     Scientific computing library
@@ -26,15 +26,29 @@ PostBuildCommand:   echo "Phew ... it is done!"
 # | Libraries                                                         |
 # +-------------------------------------------------------------------+
 
-Library owl
+Library oqam
   Path:             src
-  BuildTools:       ocamlbuild, ocamldoc
-  Modules:          OQam
-  if system(macosx)
-    CCOpt+:         -O3
-    CCLib+:         -L/usr/local/opt/openblas/lib
-                    -L/usr/local/lib/gcc/7
-                    -framework Accelerate
+  BuildTools:       ocamlbuild
+  Modules:          Oqam
+#  CCOpt:            -I$pkg_ctypes
+#  CCOpt:            -tag thread
+  BuildDepends:     owl,
+                    core_extended
+#                    ctypes,
+#                    str,
+#ctypes.stubs
+#  if system(linux) || system(linux_elf)
+#    CCOpt+:         -g -O3 -Ofast
+#    CCLib+:         -L/usr/lib
+#                    -lopenblas
+#                    -llapacke
+#  if system(macosx)
+#    CCOpt+:         -O3
+#    CCLib+:         -L/usr/local/opt/openblas/lib
+#                    -L/usr/local/lib/gcc/7
+#                    -framework Accelerate
+#                    -lopenblas
+#                    -lgfortran
 
 # +-------------------------------------------------------------------+
 # | Test                                                              |

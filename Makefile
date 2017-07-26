@@ -2,4 +2,5 @@ oasis:
 	oasis setup
 	ocaml setup.ml -configure
 all:
-	ocaml setup.ml -build
+# https://stackoverflow.com/questions/16552834/how-to-use-thread-compiler-flag-with-ocamlbuild
+	ocaml setup.ml -build -tag thread
