@@ -29,7 +29,8 @@ PostBuildCommand:   echo "Phew ... it is done!"
 Library oqam
   Path:             src
   BuildTools:       ocamlbuild
-  Modules:          Oqam
+  Modules:          Oqam,
+                    Utils
 #  CCOpt:            -I$pkg_ctypes
 #  CCOpt:            -tag thread
   BuildDepends:     owl,

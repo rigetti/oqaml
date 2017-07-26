@@ -4,6 +4,9 @@ module V = Owl.Dense.Vector.C;;
 module C = Complex;;
 module S = Core_extended.Sampler;;
 
+module U = Utils;;
+include U
+
 type wavefunc = WF of C.t list;;
 
 type instr =
@@ -32,8 +35,6 @@ type qvm =
     wf : V.vec;
   }
 
-let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float;;
-
 let rec _reverse_bin_rep x =
   let rem = x mod 2 in
   if x > 0 then rem::(_reverse_bin_rep (x / 2))
@@ -49,14 +50,13 @@ let rec range i j =
   else [];;
 
 let state_list qvm =
-  let r = range 0 (int_pow 2 qvm.num_qubits) in
+  let r = range 0 (U.int_pow 2 qvm.num_qubits) in
   List.map (fun x -> pad_list qvm.num_qubits (_reverse_bin_rep x)) r;;
 
 let create_qvm num_qubits =
   {num_qubits = num_qubits;
-   wf = ((int_pow 2 num_qubits) |> V.unit_basis) 0 |> V.transpose;
-  }
-;;
+   wf = ((U.int_pow 2 num_qubits) |> V.unit_basis) 0 |> V.transpose;
+  };;
 
 let id = M.of_arrays [| [|C.one;C.zero|];
                         [|C.zero;C.one|]|];;
@@ -113,7 +113,7 @@ let rec _build_nn_2q_gate_list i n ql g =
 let tensor_up_two_q_gate n q g =
   _kron_up (_build_nn_2q_gate_list 0 n q g);;
 
-let _multi_dot dim = List.fold_left M.dot (M.eye (int_pow 2 dim));;
+let _multi_dot dim = List.fold_left M.dot (M.eye (U.int_pow 2 dim));;
 
 let rec _swapagator_sub_kernels i dist =
   let x = i+1 in

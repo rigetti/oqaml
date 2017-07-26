@@ -53,4 +53,4 @@ type qvm
 val create_qvm : int -> qvm
 val apply_gate : gate -> qvm -> qvm
 val get_probs : qvm -> float list
-val measure : qvm -> n -> int list list
+val measure : qvm -> int -> int list list
