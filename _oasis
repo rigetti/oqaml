@@ -67,4 +67,4 @@ Executable test_runner
 Test lib_test
   Run$:             flag(tests)
   Command:          $test_runner
-  WorkingDirectory: unittest
+  WorkingDirectory: tests
