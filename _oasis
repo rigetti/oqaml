@@ -1,0 +1,56 @@
+# +-------------------------------------------------------------------+
+# | Package parameters                                                |
+# +-------------------------------------------------------------------+
+
+OASISFormat:  0.4
+Name:         OQam
+Version:      0.1
+Description:  OQam is a reference implementation of the Quil Language in OCaml
+Synopsis:     Scientific computing library
+Authors:      Johannes Otterbach (johannes@rigetti.com)
+License:      PROP
+Plugins:      META (0.4)
+OCamlVersion: >= 4.04
+BuildTools:   ocamlbuild
+Homepage:     http://rigetti.com
+
+# +-------------------------------------------------------------------+
+# | Pre- & Post-build                                                 |
+# +-------------------------------------------------------------------+
+
+PreBuildCommand:    echo "Start compiling OQaml ..."
+
+PostBuildCommand:   echo "Phew ... it is done!"
+
+# +-------------------------------------------------------------------+
+# | Libraries                                                         |
+# +-------------------------------------------------------------------+
+
+Library owl
+  Path:             src
+  BuildTools:       ocamlbuild, ocamldoc
+  Modules:          OQam
+  if system(macosx)
+    CCOpt+:         -O3
+    CCLib+:         -L/usr/local/opt/openblas/lib
+                    -L/usr/local/lib/gcc/7
+                    -framework Accelerate
+
+# +-------------------------------------------------------------------+
+# | Test                                                              |
+# +-------------------------------------------------------------------+
+
+Executable test_runner
+  Path:           tests
+  MainIs:         test_runner.ml
+  Build$:         flag(tests)
+  Custom:         true
+  CompiledObject: best
+  Install:        false
+  BuildDepends:   oqam,
+                  alcotest
+
+Test lib_test
+  Run$:             flag(tests)
+  Command:          $test_runner
+  WorkingDirectory: unittest

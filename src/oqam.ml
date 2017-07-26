@@ -1,5 +1,4 @@
 #require "owl";;
-(**#require "core";;*)
 #require "core_extended";;
 module M = Owl.Dense.Matrix.C;;
 module Math = Owl.Maths;;

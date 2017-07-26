@@ -1,0 +1,11 @@
+# OASIS_START
+# DO NOT EDIT (digest: 03df261dd082e67bbb70bb22bdb54947)
+version = "0.1"
+description = "Scientific computing library"
+archive(byte) = "owl.cma"
+archive(byte, plugin) = "owl.cma"
+archive(native) = "owl.cmxa"
+archive(native, plugin) = "owl.cmxs"
+exists_if = "owl.cma"
+# OASIS_STOP
+
