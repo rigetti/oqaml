@@ -49,8 +49,12 @@ type gate =
 type wavefunc = WF of C.t list
 
 (** The actual QVM type as a record *)
-type qvm
-val create_qvm : int -> qvm
+type qvm =
+  { num_qubits: int;
+    wf: V.vec;
+  }
+val create_qvm_in_state : int -> V.vec option -> qvm
+val init_qvm : int -> qvm
 val apply_gate : gate -> qvm -> qvm
 val get_probs : qvm -> float list
 val measure : qvm -> int -> int list list

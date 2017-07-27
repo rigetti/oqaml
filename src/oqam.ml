@@ -5,7 +5,7 @@ module C = Complex;;
 module S = Core_extended.Sampler;;
 
 module U = Utils;;
-include U
+include U;;
 
 type wavefunc = WF of C.t list;;
 
@@ -53,10 +53,14 @@ let state_list qvm =
   let r = range 0 (U.int_pow 2 qvm.num_qubits) in
   List.map (fun x -> pad_list qvm.num_qubits (_reverse_bin_rep x)) r;;
 
-let create_qvm num_qubits =
+let create_qvm_in_state num_qubits state =
+  let _init_state num_qubits = ((U.int_pow 2 num_qubits) |> V.unit_basis) 0 |> V.transpose in
+  let _wf = match state with None -> _init_state num_qubits | Some x -> x in
   {num_qubits = num_qubits;
-   wf = ((U.int_pow 2 num_qubits) |> V.unit_basis) 0 |> V.transpose;
+   wf = _wf;
   };;
+
+let init_qvm num_qubits = create_qvm_in_state num_qubits None;;
 
 let id = M.of_arrays [| [|C.one;C.zero|];
                         [|C.zero;C.one|]|];;
