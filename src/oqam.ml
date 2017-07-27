@@ -13,7 +13,6 @@ type instr =
   NOT of int
   | AND of int * int
   | OR of int * int
-;;
 
 type gate =
   I of int
@@ -26,7 +25,6 @@ type gate =
   | RZ of float * int
   | CNOT of int*int
   | SWAP of int*int
-;;
 
 type register = REG of int list;;
 
@@ -35,23 +33,9 @@ type qvm =
     wf : V.vec;
   }
 
-let rec _reverse_bin_rep x =
-  let rem = x mod 2 in
-  if x > 0 then rem::(_reverse_bin_rep (x / 2))
-  else [];;
-
-let rec pad_list n l =
-  let pl = [0]@l in
-  if List.length(pl) <= n then pad_list n pl
-  else l;;
-
-let rec range i j =
-  if i < j then i :: (range (i+1) j)
-  else [];;
-
 let state_list qvm =
-  let r = range 0 (U.int_pow 2 qvm.num_qubits) in
-  List.map (fun x -> pad_list qvm.num_qubits (_reverse_bin_rep x)) r;;
+  let r = U.range 0 (U.int_pow 2 qvm.num_qubits) in
+  List.map (fun x -> U.pad_list qvm.num_qubits (U._reverse_bin_rep x)) r;;
 
 let create_qvm_in_state num_qubits state =
   let _init_state num_qubits = ((U.int_pow 2 num_qubits) |> V.unit_basis) 0 |> V.transpose in
@@ -91,14 +75,8 @@ let cnot = M.of_arrays [| [|C.one; C.zero; C.zero; C.zero |];
 
 let _kron_up = List.fold_left M.kron (M.ones 1 1);;
 
-let rec _buildList i n q g =
-  let x = i+1 in
-  if (i != q) && (i < n) then id::(_buildList x n q g)
-  else if (i == q) && (i < n) then g::(_buildList x n q g)
-  else [];;
-
 let tensor_up_single_q_gate n q g =
-  _kron_up (_buildList 0 n q g);;
+  _kron_up (U._buildList 0 n q g);;
 
 let rec _build_nn_2q_gate_list i n ql g =
   (**This method construct a list of identies and a single two-qubit gate [g] between a control qubit [ql] and
@@ -111,8 +89,7 @@ let rec _build_nn_2q_gate_list i n ql g =
   else
     if (i != (n-2)) && (i < n-1) then id::(_build_nn_2q_gate_list x n ql g)
     else if (i == (n-2)) && (i < n) then g::[]
-    else []
-  ;;
+    else [];;
 
 let tensor_up_two_q_gate n q g =
   _kron_up (_build_nn_2q_gate_list 0 n q g);;
@@ -127,7 +104,7 @@ let rec _swapagator_sub_kernels i dist =
     * which is of dimension 16. We can construct the individual lists by using the buildList func where the
     * qubit indicates the position of the pair, leading to the reduction by 1 in length of the lists.
   *)
-  if i < dist-1 then (_kron_up (_buildList 0 (dist-1) i swap))::(_swapagator_sub_kernels x dist)
+  if i < dist-1 then (_kron_up (U._buildList 0 (dist-1) i swap))::(_swapagator_sub_kernels x dist)
   else [];;
 
 let _swapagator_kernel dist =
@@ -140,7 +117,7 @@ let swapagator ctrl trgt nqubit =
    We first construct a padding of identities to the left of [ctrl] then build the swapagator kernel of distance
    (trgt - ctrl) and finally pad more identities to the right of [trgt] to fill up to the number of qubits in
    the qvm. Finally we kron up the resulting list to get the full swapagator. *)
-  _kron_up ((_buildList 0 (ctrl+1) ctrl id)@[(_swapagator_kernel (trgt-ctrl))]@(_buildList 0 (nqubit-trgt-1) trgt id));;
+  _kron_up ((U._buildList 0 (ctrl+1) ctrl id)@[(_swapagator_kernel (trgt-ctrl))]@(U._buildList 0 (nqubit-trgt-1) trgt id));;
 
 let _build_2q_gate n ctrl trgt g=
   (**Currently this only support control qubits left of the target subits. The implementation of reverse
@@ -162,8 +139,7 @@ let apply_gate i qvm =
   | RY(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (ry t)) qvm.wf}
   | RZ(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (rz t)) qvm.wf}
   | CNOT(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (_build_2q_gate qvm.num_qubits x y cnot) qvm.wf}
-  | SWAP(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (_build_2q_gate qvm.num_qubits x y swap) qvm.wf}
-;;
+  | SWAP(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (_build_2q_gate qvm.num_qubits x y swap) qvm.wf};;
 
 let get_probs qvm =
   qvm.wf |> V.to_array |> Array.to_list |> (List.map (fun x -> (C.norm x) ** 2.0));;
@@ -182,8 +158,7 @@ let int_of_bool b = if b then 1 else 0;;
 
 let get_reg_vals reg =
     match reg with
-    | REG(lst) -> Array.of_list lst
-;;
+    | REG(lst) -> Array.of_list lst;;
 
 let bit_flip b = (1 - b);;
 let bit_and ctr tar = if (ctr == 1 && tar == 1) then 1 else 0;;
@@ -191,31 +166,18 @@ let bit_or ctr tar = if (ctr == 1 || tar == 1) then 1 else 0;;
 
 let flip x arr =
   arr.(x) <- bit_flip arr.(x);
-  arr
-;;
+  arr;;
 
 let cand x y arr =
   arr.(y) <-  bit_and arr.(x) arr.(y);
-  arr
-;;
+  arr;;
 
 let cor x y arr =
   arr.(y) <- bit_or arr.(x) arr.(y);
-  arr
-;;
+  arr;;
 
 let apply (i, r) =
   match i with
   | NOT(x) -> REG(Array.to_list(flip x (get_reg_vals r)))
   | AND(x, y) -> REG(Array.to_list(cand x y (get_reg_vals r)))
-  | OR(x, y) -> REG(Array.to_list(cor x y (get_reg_vals r)))
-;;
-
-type transition = TRANS of (instr * register -> register);;
-
-let execute = TRANS(apply);;
-
-let get_apply a =
-  match a with
-  | TRANS(func) -> func
-;;
+  | OR(x, y) -> REG(Array.to_list(cor x y (get_reg_vals r)));;
