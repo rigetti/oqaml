@@ -48,13 +48,11 @@ let create_qvm_in_state num_qubits state =
 
 let init_qvm num_qubits = create_qvm_in_state num_qubits None;;
 
-let _kron_up = List.fold_left M.kron (M.ones 1 1);;
-
 let tensor_up_single_q_gate n q g =
-  _kron_up (U._buildList 0 n q g);;
+  U.kron_up (U._buildList 0 n q g);;
 
 let tensor_up_two_q_gate n q g =
-  _kron_up (U._build_nn_2q_gate_list 0 n q g);;
+  U.kron_up (U._build_nn_2q_gate_list 0 n q g);;
 
 let swapagator ctrl trgt nqubit =
   (**This constructs the full swapagatpr to bring a target qubit [trgt] next to the control qubit [ctrl].
@@ -73,19 +71,19 @@ let swapagator ctrl trgt nqubit =
        * which is of dimension 16. We can construct the individual lists by using the buildList func where the
        * qubit indicates the position of the pair, leading to the reduction by 1 in length of the lists.
        *)
-      if i < dist-1 then (_kron_up (U._buildList 0 (dist-1) i swap))::(_swapagator_sub_kernels x dist)
+      if i < dist-1 then (U.kron_up (U._buildList 0 (dist-1) i swap))::(_swapagator_sub_kernels x dist)
       else []
     in
     _multi_dot dist (_swapagator_sub_kernels 0 dist)
   in
-  _kron_up ((U._buildList 0 (ctrl+1) ctrl id)@[(_swapagator_kernel (trgt-ctrl))]@(U._buildList 0 (nqubit-trgt-1) trgt id));;
+  U.kron_up ((U._buildList 0 (ctrl+1) ctrl id)@[(_swapagator_kernel (trgt-ctrl))]@(U._buildList 0 (nqubit-trgt-1) trgt id));;
 
 let get_2q_gate n ctrl trgt g=
   (**Currently this only support control qubits left of the target subits. The implementation of reverse
    is merely a 180 degree rotation of the resulting matrix. Howver, I need to double check this to make
    sure of that. *)
   let swpgtr = swapagator ctrl trgt n in
-  let gt = _kron_up (_build_nn_2q_gate_list 0 n ctrl g) in
+  let gt = U.kron_up (_build_nn_2q_gate_list 0 n ctrl g) in
   M.dot swpgtr (M.dot gt swpgtr);;
 
 
