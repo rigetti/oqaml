@@ -39,10 +39,8 @@ let create_qvm_in_state num_qubits state =
 
 let init_qvm num_qubits = create_qvm_in_state num_qubits None;;
 
-let tensor_up_single_q_gate n q g =
+let get_1q_gate n q g =
   U.kron_up (U._buildList 0 n q g);;
-
-
 
 let swapagator ctrl trgt nqubit =
   (** This constructs the full swapagatpr to bring a target qubit [trgt] next to the control qubit [ctrl].
@@ -75,17 +73,16 @@ let get_2q_gate n ctrl trgt g=
   let gt = U.kron_up (_build_nn_2q_gate_list 0 n ctrl g) in
   M.dot swpgtr (M.dot gt swpgtr);;
 
-
 let apply_gate i qvm =
   match i with
-  | I(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x id) qvm.wf}
-  | X(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x sx) qvm.wf}
-  | Y(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x sy) qvm.wf}
-  | Z(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x sz) qvm.wf}
-  | H(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x h) qvm.wf}
-  | RX(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (rx t)) qvm.wf}
-  | RY(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (ry t)) qvm.wf}
-  | RZ(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (rz t)) qvm.wf}
+  | I(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x id) qvm.wf}
+  | X(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x sx) qvm.wf}
+  | Y(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x sy) qvm.wf}
+  | Z(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x sz) qvm.wf}
+  | H(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x h) qvm.wf}
+  | RX(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (rx t)) qvm.wf}
+  | RY(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (ry t)) qvm.wf}
+  | RZ(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (rz t)) qvm.wf}
   | CNOT(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_2q_gate qvm.num_qubits x y cnot) qvm.wf}
   | SWAP(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_2q_gate qvm.num_qubits x y swap) qvm.wf};;
 
