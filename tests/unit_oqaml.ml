@@ -2,6 +2,7 @@ module M = Owl.Dense.Matrix.C;;
 module Q = Oqaml;;
 module U = Utils;;
 module C = Complex;;
+module P = Primitives;;
 
 let kron_assert = M.of_arrays [| [|C.one; C.zero; C.zero; C.zero |];
                                  [|C.zero; C.one; C.zero; C.zero |];
@@ -15,9 +16,9 @@ let rotate_cnot = M.of_arrays [| [|C.zero; C.one; C.zero; C.zero |];
 
 module To_test = struct
 
-  let kron_up () = Q._kron_up [Q.id; Q.id] = kron_assert
+  let kron_up () = Q._kron_up [P.id; P.id] = kron_assert
 
-  let build_list () = U._buildList 0 4 1 Q.sx = [Q.id; Q.sx; Q.id; Q.id]
+  let build_list () = U._buildList 0 4 1 P.sx = [P.id; P.sx; P.id; P.id]
 
   let int_pow () = U.int_pow 2 5 = 32
 
@@ -27,15 +28,15 @@ module To_test = struct
 
   let pad_list () = U.pad_list 4 [1; 1] = [0; 0; 1; 1]
 
-  let nn_2q_gate_list () = U._build_nn_2q_gate_list 0 3 1 Q.cnot = [Q.id; Q.cnot]
+  let nn_2q_gate_list () = U._build_nn_2q_gate_list 0 3 1 P.cnot = [P.id; P.cnot]
 
-  let swpgtr () = Q.swapagator 0 2 5 = Q._kron_up [Q.id; Q.swap; Q.id; Q.id]
+  let swpgtr () = Q.swapagator 0 2 5 = Q._kron_up [P.id; P.swap; P.id; P.id]
   (* Assert can be kron as we check the correctness of kron above*)
 
-  let swpgtr2 () = Q.swapagator 0 3 5 = M.dot (Q._kron_up [Q.id; Q.swap; Q.id; Q.id]) (Q._kron_up [Q.id; Q.id; Q.swap; Q.id])
+  let swpgtr2 () = Q.swapagator 0 3 5 = M.dot (Q._kron_up [P.id; P.swap; P.id; P.id]) (Q._kron_up [P.id; P.id; P.swap; P.id])
   (* Assert can be kron as we check the correctness of kron above and M.dot is external dep*)
 
-  let get_2q_gt () = Q.get_2q_gate 3 0 2 Q.cnot = M.dot (Q.swapagator 0 2 3) (M.dot (Q._kron_up [Q.cnot; Q.id]) (Q.swapagator 0 2 3))
+  let get_2q_gt () = Q.get_2q_gate 3 0 2 P.cnot = M.dot (Q.swapagator 0 2 3) (M.dot (Q._kron_up [P.cnot; P.id]) (Q.swapagator 0 2 3))
 
 end
 

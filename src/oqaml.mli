@@ -17,21 +17,6 @@ val tensor_up_single_q_gate : int -> int -> M.mat -> M.mat
 
 val _kron_up : M.mat list -> M.mat
 
-(** Single-Qubit Gates *)
-val id : M.mat
-val sx : M.mat
-val sy : M.mat
-val sy : M.mat
-
-(** Single-Qubit Parametric Gates *)
-val rx : float -> M.mat
-val ry : float -> M.mat
-val rz : float -> M.mat
-
-(** Two-Qubit Gates *)
-val cnot: M.mat
-val swap: M.mat
-
 (** Gate operations on Qubits with integer index *)
 type gate =
   I of int

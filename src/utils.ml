@@ -1,5 +1,6 @@
 module Ma = Owl.Dense.Matrix.C;;
 module Co = Complex;;
+open Primitives;;
 
 let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float;;
 
@@ -16,8 +17,6 @@ let rec pad_list n l =
 let rec range i j =
   if i < j then i :: (range (i+1) j)
   else [];;
-
-let id = Ma.of_arrays [| [|Co.one; Co.zero|]; [|Co.zero; Co.one|]|];;
 
 let rec _buildList i n q g =
   let x = i+1 in
