@@ -1,5 +1,5 @@
 module M = Owl.Dense.Matrix.C;;
-module Q = Oqam;;
+module Q = Oqaml;;
 module U = Utils;;
 module C = Complex;;
 

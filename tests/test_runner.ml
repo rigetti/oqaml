@@ -1,5 +1,5 @@
 let () = begin
   Alcotest.run "OQaml" [
-    "OQAM", Unit_oqam.test_set;
+    "OQAML", Unit_oqaml.test_set;
   ]
 end
