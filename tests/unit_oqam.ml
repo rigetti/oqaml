@@ -4,9 +4,14 @@ module U = Utils;;
 module C = Complex;;
 
 let kron_assert = M.of_arrays [| [|C.one; C.zero; C.zero; C.zero |];
-                          [|C.zero; C.one; C.zero; C.zero |];
-                          [|C.zero; C.zero; C.one; C.zero |];
-                          [|C.zero; C.zero; C.zero; C.one |] |];;
+                                 [|C.zero; C.one; C.zero; C.zero |];
+                                 [|C.zero; C.zero; C.one; C.zero |];
+                                 [|C.zero; C.zero; C.zero; C.one |] |];;
+
+let rotate_cnot = M.of_arrays [| [|C.zero; C.one; C.zero; C.zero |];
+                                 [|C.one; C.zero; C.zero; C.zero |];
+                                 [|C.zero; C.zero; C.one; C.zero |];
+                                 [|C.zero; C.zero; C.zero; C.one |] |];;
 
 module To_test = struct
 
@@ -21,6 +26,16 @@ module To_test = struct
   let bin_rep () = U._reverse_bin_rep 11 = [1;1;0;1]
 
   let pad_list () = U.pad_list 4 [1; 1] = [0; 0; 1; 1]
+
+  let nn_2q_gate_list () = U._build_nn_2q_gate_list 0 3 1 Q.cnot = [Q.id; Q.cnot]
+
+  let swpgtr () = Q.swapagator 0 2 5 = Q._kron_up [Q.id; Q.swap; Q.id; Q.id]
+  (* Assert can be kron as we check the correctness of kron above*)
+
+  let swpgtr2 () = Q.swapagator 0 3 5 = M.dot (Q._kron_up [Q.id; Q.swap; Q.id; Q.id]) (Q._kron_up [Q.id; Q.id; Q.swap; Q.id])
+  (* Assert can be kron as we check the correctness of kron above and M.dot is external dep*)
+
+  let get_2q_gt () = Q.get_2q_gate 3 0 2 Q.cnot = M.dot (Q.swapagator 0 2 3) (M.dot (Q._kron_up [Q.cnot; Q.id]) (Q.swapagator 0 2 3))
 
 end
 
@@ -42,6 +57,18 @@ let bin_rep () =
 let pad_list () =
   Alcotest.(check bool) "pad_list" true (To_test.pad_list ())
 
+let nn_2q_gate_list () =
+  Alcotest.(check bool) "nn_2q_gate_list" true (To_test.nn_2q_gate_list ())
+
+let swpgtr () =
+  Alcotest.(check bool) "swpgtr" true (To_test.swpgtr ())
+
+let swpgtr2 () =
+  Alcotest.(check bool) "swpgtr" true (To_test.swpgtr2 ())
+
+let get_2q_gt () =
+  Alcotest.(check bool) "get_2q_gt" true (To_test.get_2q_gt ())
+
 let test_set = [
     "kron up", `Slow, kron_up;
     "build list", `Slow, build_list;
@@ -49,4 +76,8 @@ let test_set = [
     "range", `Slow, range;
     "bit string", `Slow, bin_rep;
     "list padding", `Slow, pad_list;
+    "2Q NN gate list", `Slow, nn_2q_gate_list;
+    "Dist-2 Swapagator", `Slow, swpgtr;
+    "Dist-3 Swapagator", `Slow, swpgtr2;
+    "Dist-2 CNOT gate", `Slow, get_2q_gt;
   ];;

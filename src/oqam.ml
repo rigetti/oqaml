@@ -78,21 +78,8 @@ let _kron_up = List.fold_left M.kron (M.ones 1 1);;
 let tensor_up_single_q_gate n q g =
   _kron_up (U._buildList 0 n q g);;
 
-let rec _build_nn_2q_gate_list i n ql g =
-  (**This method construct a list of identies and a single two-qubit gate [g] between a control qubit [ql] and
-   its target at position (ql+1) on a qubit register of length [n]. The value [i] is used for recursion purposes only*)
-  let x = i+1 in
-  if ql < n-1 then
-    if (i != ql) && (i < n) then id::(_build_nn_2q_gate_list x n ql g)
-    else if (i == ql) && (i < n-1) then g::(_build_nn_2q_gate_list (x+1) n ql g)
-    else []
-  else
-    if (i != (n-2)) && (i < n-1) then id::(_build_nn_2q_gate_list x n ql g)
-    else if (i == (n-2)) && (i < n) then g::[]
-    else [];;
-
 let tensor_up_two_q_gate n q g =
-  _kron_up (_build_nn_2q_gate_list 0 n q g);;
+  _kron_up (U._build_nn_2q_gate_list 0 n q g);;
 
 let _multi_dot dim = List.fold_left M.dot (M.eye (U.int_pow 2 dim));;
 
@@ -119,7 +106,7 @@ let swapagator ctrl trgt nqubit =
    the qvm. Finally we kron up the resulting list to get the full swapagator. *)
   _kron_up ((U._buildList 0 (ctrl+1) ctrl id)@[(_swapagator_kernel (trgt-ctrl))]@(U._buildList 0 (nqubit-trgt-1) trgt id));;
 
-let _build_2q_gate n ctrl trgt g=
+let get_2q_gate n ctrl trgt g=
   (**Currently this only support control qubits left of the target subits. The implementation of reverse
    is merely a 180 degree rotation of the resulting matrix. Howver, I need to double check this to make
    sure of that. *)
@@ -138,8 +125,8 @@ let apply_gate i qvm =
   | RX(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (rx t)) qvm.wf}
   | RY(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (ry t)) qvm.wf}
   | RZ(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (tensor_up_single_q_gate qvm.num_qubits x (rz t)) qvm.wf}
-  | CNOT(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (_build_2q_gate qvm.num_qubits x y cnot) qvm.wf}
-  | SWAP(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (_build_2q_gate qvm.num_qubits x y swap) qvm.wf};;
+  | CNOT(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_2q_gate qvm.num_qubits x y cnot) qvm.wf}
+  | SWAP(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_2q_gate qvm.num_qubits x y swap) qvm.wf};;
 
 let get_probs qvm =
   qvm.wf |> V.to_array |> Array.to_list |> (List.map (fun x -> (C.norm x) ** 2.0));;

@@ -58,3 +58,5 @@ val init_qvm : int -> qvm
 val apply_gate : gate -> qvm -> qvm
 val get_probs : qvm -> float list
 val measure : qvm -> int -> int list list
+val swapagator : int -> int -> int -> M.mat
+val get_2q_gate : int -> int -> int -> M.mat -> M.mat
