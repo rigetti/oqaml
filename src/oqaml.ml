@@ -46,22 +46,21 @@ let tensor_up_two_q_gate n q g =
   U.kron_up (U._build_nn_2q_gate_list 0 n q g);;
 
 let swapagator ctrl trgt nqubit =
-  (**This constructs the full swapagatpr to bring a target qubit [trgt] next to the control qubit [ctrl].
-     We first construct a padding of identities to the left of [ctrl] then build the swapagator kernel of distance
-     (trgt - ctrl) and finally pad more identities to the right of [trgt] to fill up to the number of qubits in
-     the qvm. Finally we kron up the resulting list to get the full swapagator. *)
+  (** This constructs the full swapagatpr to bring a target qubit [trgt] next to the control qubit [ctrl].
+      We first construct a padding of identities to the left of [ctrl] then build the swapagator kernel of distance
+      (trgt - ctrl) and finally pad more identities to the right of [trgt] to fill up to the number of qubits in
+      the qvm. Finally we kron up the resulting list to get the full swapagator. *)
   let _swapagator_kernel dist =
-    (**This method is a helper to multiply all the individual nearest neighbor SWAPs to propagate a qubit state
-       over a distance [dist]*)
+    (** This method is a helper to multiply all the individual nearest neighbor SWAPs to propagate a qubit state
+        over a distance [dist]*)
     let _multi_dot dim = List.fold_left M.dot (M.eye (U.int_pow 2 dim)) in
     let rec _swapagator_sub_kernels i dist =
       let x = i+1 in
       (** We need to account for the fact that we have a 2-Qubit gate already. Hence when constructing
-       * the list of propagators we make the distance short by one as we already have a lifted gate. E.g.
-       * a given swapagator for 4 particles is [(kron swap id id) * (kron id swap id) * (kron id id swap)],
-       * which is of dimension 16. We can construct the individual lists by using the buildList func where the
-       * qubit indicates the position of the pair, leading to the reduction by 1 in length of the lists.
-       *)
+          the list of propagators we make the distance short by one as we already have a lifted gate. E.g.
+          a given swapagator for 4 particles is [(kron swap id id) * (kron id swap id) * (kron id id swap)],
+          which is of dimension 16. We can construct the individual lists by using the buildList func where the
+          qubit indicates the position of the pair, leading to the reduction by 1 in length of the lists.*)
       if i < dist-1 then (U.kron_up (U._buildList 0 (dist-1) i swap))::(_swapagator_sub_kernels x dist)
       else []
     in
@@ -135,7 +134,7 @@ let cor x y arr =
   arr.(y) <- bit_or arr.(x) arr.(y);
   arr;;
 
-let apply (i, r) =
+let apply i r =
   match i with
   | NOT(x) -> REG(Array.to_list(flip x (get_reg_vals r)))
   | AND(x, y) -> REG(Array.to_list(cand x y (get_reg_vals r)))

@@ -11,7 +11,7 @@ type instr = | NOT of int
              | OR of int * int
 
 (** Apply an instruction to a register to obtain a new register state *)
-val apply : instr * register -> register
+val apply : instr -> register -> register
 
 (** Gate operations on Qubits with integer index *)
 type gate =
