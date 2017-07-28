@@ -1,0 +1,11 @@
+_build
+_tags
+myocamlbuild.ml
+setup.data
+setup.log
+setup.ml
+src/META
+src/oqaml.mldylib
+src/oqaml.mllib
+test_runner.native
+tests/_build/
