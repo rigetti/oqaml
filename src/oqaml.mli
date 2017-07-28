@@ -26,9 +26,6 @@ type gate =
   | CNOT of int*int
   | SWAP of int*int
 
-(** Wavefunction type as a list of complex numbers *)
-type wavefunc = WF of C.t list
-
 (** The actual QVM type as a record *)
 type qvm =
   { num_qubits: int;

@@ -3,19 +3,12 @@ module Math = Owl.Maths;;
 module V = Owl.Dense.Vector.C;;
 module C = Complex;;
 module S = Core_extended.Sampler;;
+module U = Utils;;
+include U;;
 open Primitives;;
 
 
-module U = Utils;;
-include U;;
-
-type wavefunc = WF of C.t list;;
-
-type instr =
-  NOT of int
-  | AND of int * int
-  | OR of int * int
-
+(** QVM supporting ProtoQuil *)
 type gate =
   I of int
   | X of int
@@ -27,8 +20,6 @@ type gate =
   | RZ of float * int
   | CNOT of int*int
   | SWAP of int*int
-
-type register = REG of int list;;
 
 type qvm =
   { num_qubits: int;
@@ -111,6 +102,15 @@ let measure qvm n =
     else []
   in
   sample_state smplr n 0;;
+
+
+(** Classical Bit Register *)
+type instr =
+  NOT of int
+  | AND of int * int
+  | OR of int * int
+
+type register = REG of int list;;
 
 let bool_of_int i = if i==1 then true else false;;
 let int_of_bool b = if b then 1 else 0;;
