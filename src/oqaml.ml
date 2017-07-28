@@ -42,8 +42,7 @@ let init_qvm num_qubits = create_qvm_in_state num_qubits None;;
 let tensor_up_single_q_gate n q g =
   U.kron_up (U._buildList 0 n q g);;
 
-let tensor_up_two_q_gate n q g =
-  U.kron_up (U._build_nn_2q_gate_list 0 n q g);;
+
 
 let swapagator ctrl trgt nqubit =
   (** This constructs the full swapagatpr to bring a target qubit [trgt] next to the control qubit [ctrl].
