@@ -7,7 +7,6 @@ module U = Utils;;
 include U;;
 open Primitives;;
 
-
 (** QVM supporting ProtoQuil *)
 type gate =
   I of int
@@ -84,7 +83,8 @@ let apply_gate i qvm =
   | RY(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (ry t)) qvm.wf}
   | RZ(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (rz t)) qvm.wf}
   | CNOT(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_2q_gate qvm.num_qubits x y cnot) qvm.wf}
-  | SWAP(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_2q_gate qvm.num_qubits x y swap) qvm.wf};;
+  | SWAP(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_2q_gate qvm.num_qubits x y
+                                                                     swap) qvm.wf};;
 
 let get_probs qvm =
   qvm.wf |> V.to_array |> Array.to_list |> (List.map (fun x -> (C.norm x) ** 2.0));;
@@ -98,6 +98,17 @@ let measure qvm n =
   in
   sample_state smplr n 0;;
 
+type instruction_set = IS of gate list;;
+let append_instr g is =
+  match is with
+  | IS([]) -> IS([g])
+  | IS(x)  -> IS([g]@x);;
+
+let rec apply_instructions is qvm =
+  match is with
+  | IS([]) -> qvm
+  | IS([x]) -> apply_gate x qvm
+  | IS(h::t) -> apply_gate (h) (apply_instructions (IS(t)) qvm);;
 
 (** Classical Bit Register *)
 type instr =

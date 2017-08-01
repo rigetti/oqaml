@@ -38,3 +38,7 @@ val get_probs : qvm -> float list
 val measure : qvm -> int -> int list list
 val swapagator : int -> int -> int -> M.mat
 val get_2q_gate : int -> int -> int -> M.mat -> M.mat
+
+type instruction_set = IS of gate list
+val append_instr : gate -> instruction_set -> instruction_set
+val apply_instructions : instruction_set -> qvm -> qvm

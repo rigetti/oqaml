@@ -30,7 +30,8 @@ Library oqaml
   Path:             src
   BuildTools:       ocamlbuild
   Modules:          Oqaml,
-                    Utils
+                    Utils,
+                    Primitives
   BuildDepends:     owl,
                     core_extended
 
