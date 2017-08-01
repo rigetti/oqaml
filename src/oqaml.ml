@@ -107,8 +107,7 @@ let append_instr g is =
 let rec apply_instructions is qvm =
   match is with
   | IS([]) -> qvm
-  | IS([x]) -> apply_gate x qvm
-  | IS(h::t) -> apply_gate (h) (apply_instructions (IS(t)) qvm);;
+  | IS(x) -> List.fold_right (fun z y -> apply_gate z y ) x qvm;;
 
 (** Classical Bit Register *)
 type instr =

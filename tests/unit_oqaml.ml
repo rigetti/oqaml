@@ -1,4 +1,5 @@
 module M = Owl.Dense.Matrix.C;;
+module V = Owl.Dense.Vector.C;;
 module Q = Oqaml;;
 module U = Utils;;
 module C = Complex;;
@@ -38,6 +39,8 @@ module To_test = struct
 
   let get_2q_gt () = Q.get_2q_gate 3 0 2 P.cnot = M.dot (Q.swapagator 0 2 3) (M.dot (U.kron_up [P.cnot; P.id]) (Q.swapagator 0 2 3))
 
+  let apply_instr_set () = Q.apply_instructions (Q.IS([Q.Y 2; Q.CNOT (0,1); Q.X 0])) (Q.init_qvm 3) = {Q.num_qubits=3; wf=V.mul_scalar (V.unit_basis 8 7) (C.i) |> V.transpose};;
+
 end
 
 let kron_up () =
@@ -70,6 +73,9 @@ let swpgtr2 () =
 let get_2q_gt () =
   Alcotest.(check bool) "get_2q_gt" true (To_test.get_2q_gt ())
 
+let apply_instr_set () =
+  Alcotest.(check bool) "apply_instr_set" true (To_test.apply_instr_set ())
+
 let test_set = [
     "kron up", `Slow, kron_up;
     "build list", `Slow, build_list;
@@ -81,4 +87,5 @@ let test_set = [
     "Dist-2 Swapagator", `Slow, swpgtr;
     "Dist-3 Swapagator", `Slow, swpgtr2;
     "Dist-2 CNOT gate", `Slow, get_2q_gt;
+    "Apply instruction set", `Slow, apply_instr_set;
   ];;
