@@ -98,16 +98,16 @@ let measure qvm n =
   in
   sample_state smplr n 0;;
 
-type instruction_set = IS of gate list;;
+type instruction_set = INSTRUCTIONSET of gate list;;
 let append_instr g is =
   match is with
-  | IS([]) -> IS([g])
-  | IS(x)  -> IS([g]@x);;
+  | INSTRUCTIONSET([]) -> INSTRUCTIONSET([g])
+  | INSTRUCTIONSET(x)  -> INSTRUCTIONSET([g]@x);;
 
 let rec apply_instructions is qvm =
   match is with
-  | IS([]) -> qvm
-  | IS(x) -> List.fold_right (fun z y -> apply_gate z y ) x qvm;;
+  | INSTRUCTIONSET([]) -> qvm
+  | INSTRUCTIONSET(x) -> List.fold_right (fun z y -> apply_gate z y ) x qvm;;
 
 (** Classical Bit Register *)
 type instr =
