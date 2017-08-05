@@ -4,6 +4,10 @@ module C = Complex;;
 
 let id = M.of_arrays [| [|C.one;C.zero|];
                         [|C.zero;C.one|]|];;
+let proj_0 = M.of_arrays [| [|C.one;C.zero|];
+                            [|C.zero;C.zero|]|];;
+let proj_1 = M.of_arrays [| [|C.zero;C.zero|];
+                            [|C.zero;C.one|]|];;
 let sx = M.of_arrays [| [|C.zero;C.one|];
                         [|C.one;C.zero|]|];;
 let sy = M.of_arrays [| [|C.zero;C.conj C.i|];

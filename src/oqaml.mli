@@ -1,6 +1,7 @@
 module M = Owl.Dense.Matrix.C;;
 module C = Complex;;
 module V = Owl.Dense.Vector.C;;
+module A = Array;;
 
 (** An ordered collection of bits *)
 type register = REG of int list
@@ -30,12 +31,14 @@ type gate =
 type qvm =
   { num_qubits: int;
     wf: V.vec;
+    reg: int array;
   }
 val create_qvm_in_state : int -> V.vec option -> qvm
 val init_qvm : int -> qvm
 val apply_gate : gate -> qvm -> qvm
 val get_probs : qvm -> float list
-val measure : qvm -> int -> int list list
+val measure: qvm -> int -> qvm
+val measure_all : qvm -> int -> int list list
 val swapagator : int -> int -> int -> M.mat
 val get_2q_gate : int -> int -> int -> M.mat -> M.mat
 

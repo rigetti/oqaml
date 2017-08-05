@@ -2,9 +2,12 @@ module M = Owl.Dense.Matrix.C;;
 module Math = Owl.Maths;;
 module V = Owl.Dense.Vector.C;;
 module C = Complex;;
+open C;;
 module S = Core_extended.Sampler;;
 module U = Utils;;
 include U;;
+module R = Random;;
+module A = Array;;
 open Primitives;;
 
 (** QVM supporting ProtoQuil *)
@@ -23,6 +26,7 @@ type gate =
 type qvm =
   { num_qubits: int;
     wf : V.vec;
+    reg: int array;
   }
 
 let state_list qvm =
@@ -32,8 +36,10 @@ let state_list qvm =
 let create_qvm_in_state num_qubits state =
   let _init_state num_qubits = ((U.int_pow 2 num_qubits) |> V.unit_basis) 0 |> V.transpose in
   let _wf = match state with None -> _init_state num_qubits | Some x -> x in
+  let _reg = A.make num_qubits 0 in
   {num_qubits = num_qubits;
    wf = _wf;
+   reg = _reg;
   };;
 
 let init_qvm num_qubits = create_qvm_in_state num_qubits None;;
@@ -74,22 +80,22 @@ let get_2q_gate n ctrl trgt g=
 
 let apply_gate i qvm =
   match i with
-  | I(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x id) qvm.wf}
-  | X(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x sx) qvm.wf}
-  | Y(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x sy) qvm.wf}
-  | Z(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x sz) qvm.wf}
-  | H(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x h) qvm.wf}
-  | RX(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (rx t)) qvm.wf}
-  | RY(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (ry t)) qvm.wf}
-  | RZ(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (rz t)) qvm.wf}
-  | CNOT(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_2q_gate qvm.num_qubits x y cnot) qvm.wf}
+  | I(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x id) qvm.wf; reg = qvm.reg}
+  | X(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x sx) qvm.wf; reg = qvm.reg}
+  | Y(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x sy) qvm.wf; reg = qvm.reg}
+  | Z(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x sz) qvm.wf; reg = qvm.reg}
+  | H(x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x h) qvm.wf; reg = qvm.reg}
+  | RX(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (rx t)) qvm.wf; reg = qvm.reg}
+  | RY(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (ry t)) qvm.wf; reg = qvm.reg}
+  | RZ(t,x) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_1q_gate qvm.num_qubits x (rz t)) qvm.wf; reg = qvm.reg}
+  | CNOT(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_2q_gate qvm.num_qubits x y cnot) qvm.wf; reg = qvm.reg}
   | SWAP(x,y) -> {num_qubits=qvm.num_qubits; wf = V.dot (get_2q_gate qvm.num_qubits x y
-                                                                     swap) qvm.wf};;
+                                                                     swap) qvm.wf; reg = qvm.reg};;
 
 let get_probs qvm =
   qvm.wf |> V.to_array |> Array.to_list |> (List.map (fun x -> (C.norm x) ** 2.0));;
 
-let measure qvm n =
+let measure_all qvm n =
   let smplr = S.create (List.map2 (fun x y -> (x, y)) (state_list qvm) (get_probs qvm)) in
   let rec sample_state smplr n i =
     let j = i+1 in
@@ -97,6 +103,21 @@ let measure qvm n =
     else []
   in
   sample_state smplr n 0;;
+
+let measure qvm idx =
+  let projector_0 = get_1q_gate qvm.num_qubits idx proj_0 in
+  let projector_1 = get_1q_gate qvm.num_qubits idx proj_1 in
+  let exp_val = V.dot (V.map C.conj qvm.wf |> V.transpose) (M.dot projector_0 qvm.wf) in
+  let prob_0 = Array.get (V.to_array exp_val) 0 |> (fun x -> x.re) in
+  let rejection_prob = R.float 1. in
+  if rejection_prob < prob_0 then
+    let _reg = qvm.reg in
+    A.set _reg idx 0;
+    {num_qubits=qvm.num_qubits; wf = V.div_scalar (M.dot projector_0 qvm.wf) ({C.re=Math.sqrt prob_0; im=0.}); reg = _reg}
+  else
+    let _reg = qvm.reg in
+    A.set _reg idx 1;
+    {num_qubits=qvm.num_qubits; wf = V.div_scalar (M.dot projector_1 qvm.wf) ({C.re=Math.sqrt (1. -. prob_0); im=0.}); reg = _reg};;
 
 type instruction_set = INSTRUCTIONSET of gate list;;
 let append_instr g is =
@@ -108,6 +129,7 @@ let rec apply_instructions is qvm =
   match is with
   | INSTRUCTIONSET([]) -> qvm
   | INSTRUCTIONSET(x) -> List.fold_right (fun z y -> apply_gate z y ) x qvm;;
+
 
 (** Classical Bit Register *)
 type instr =
