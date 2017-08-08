@@ -4,7 +4,7 @@ open Primitives;;
 
 let kron_up = List.fold_left Ma.kron (Ma.ones 1 1);;
 
-let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float;;
+let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float
 
 let rec _reverse_bin_rep x =
   let rem = x mod 2 in
@@ -26,9 +26,10 @@ let rec _buildList i n q g =
   else if (i == q) && (i < n) then g::(_buildList x n q g)
   else [];;
 
+(* This method construct a list of identies and a single two-qubit gate [g]
+ * between a control qubit [ql] and its target at position (ql+1) on a qubit
+ * register of length [n]. The value [i] is used for recursion purposes only *)
 let rec _build_nn_2q_gate_list i n ql g =
-  (**This method construct a list of identies and a single two-qubit gate [g] between a control qubit [ql] and
-   its target at position (ql+1) on a qubit register of length [n]. The value [i] is used for recursion purposes only*)
   let x = i+1 in
   if ql < n-1 then
     if (i != ql) && (i < n) then id::(_build_nn_2q_gate_list x n ql g)

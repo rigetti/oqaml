@@ -15,7 +15,8 @@ let sy = M.of_arrays [| [|C.zero;C.conj C.i|];
 let sz = M.of_arrays [| [|C.one;C.zero|];
                         [|C.zero;C.neg C.one|]|];;
 let h = (M.of_arrays [| [|C.one; C.one|];
-                        [|C.one; C.neg C.one|] |] |> M.div_scalar) (C.sqrt{C.re=2.0; im=0.0});;
+                        [|C.one; C.neg C.one|] |] |> M.div_scalar)
+          (C.sqrt{C.re=2.0; im=0.0});;
 
 let ct t = {C.re=Math.cos (t /. 2.0); im=0.0};;
 let ist t = {C.re=0.0; im=(Math.sin (t /. 2.0))};;
