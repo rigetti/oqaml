@@ -1,7 +1,5 @@
-module M = Owl.Dense.Matrix.C;;
-module C = Complex;;
-module V = Owl.Dense.Vector.C;;
-module A = Array;;
+module M = Owl.Dense.Matrix.C
+module V = Owl.Dense.Vector.C
 
 (** An ordered collection of bits *)
 type register = REG of int list
@@ -24,8 +22,8 @@ type gate =
   | RX of float * int
   | RY of float * int
   | RZ of float * int
-  | CNOT of int*int
-  | SWAP of int*int
+  | CNOT of int * int
+  | SWAP of int * int
 
 (** The actual QVM type as a record *)
 type qvm =
@@ -33,7 +31,7 @@ type qvm =
     wf: V.vec;
     reg: int array;
   }
-val create_qvm_in_state : int -> V.vec option -> qvm
+
 val init_qvm : int -> qvm
 val apply_gate : gate -> qvm -> qvm
 val get_probs : qvm -> float list

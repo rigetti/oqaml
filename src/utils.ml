@@ -1,30 +1,30 @@
-module Ma = Owl.Dense.Matrix.C;;
-module Co = Complex;;
-open Primitives;;
+open Primitives
 
-let kron_up = List.fold_left Ma.kron (Ma.ones 1 1);;
+let kron_up =
+  let module M = Owl.Dense.Matrix.C in
+  List.fold_left M.kron (M.ones 1 1)
 
 let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float
 
 let rec _reverse_bin_rep x =
   let rem = x mod 2 in
   if x > 0 then rem::(_reverse_bin_rep (x / 2))
-  else [];;
+  else []
 
 let rec pad_list n l =
   let pl = [0]@l in
   if List.length(pl) <= n then pad_list n pl
-  else l;;
+  else l
 
 let rec range i j =
   if i < j then i :: (range (i+1) j)
-  else [];;
+  else []
 
 let rec _buildList i n q g =
   let x = i+1 in
   if (i != q) && (i < n) then id::(_buildList x n q g)
   else if (i == q) && (i < n) then g::(_buildList x n q g)
-  else [];;
+  else []
 
 (* This method construct a list of identies and a single two-qubit gate [g]
  * between a control qubit [ql] and its target at position (ql+1) on a qubit
@@ -38,4 +38,4 @@ let rec _build_nn_2q_gate_list i n ql g =
   else
     if (i != (n-2)) && (i < n-1) then id::(_build_nn_2q_gate_list x n ql g)
     else if (i == (n-2)) && (i < n) then g::[]
-    else [];;
+    else []
