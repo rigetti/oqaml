@@ -28,16 +28,19 @@ let build_gate_list n q g =
     else [] in
   _buildList 0 n q g
 
+
 (* This method construct a list of identies and a single two-qubit gate [g]
  * between a control qubit [ql] and its target at position (ql+1) on a qubit
  * register of length [n]. The value [i] is used for recursion purposes only *)
-let rec _build_nn_2q_gate_list i n ql g =
-  let x = i+1 in
-  if ql < n-1 then
-    if (i != ql) && (i < n) then id::(_build_nn_2q_gate_list x n ql g)
-    else if (i == ql) && (i < n-1) then g::(_build_nn_2q_gate_list (x+1) n ql g)
-    else []
-  else
-    if (i != (n-2)) && (i < n-1) then id::(_build_nn_2q_gate_list x n ql g)
-    else if (i == (n-2)) && (i < n) then g::[]
-    else []
+let build_gate_list_with_2q_gate n ql g =
+  let rec _build_nn_2q_gate_list i n ql g =
+    let x = i+1 in
+    if ql < n-1 then
+      if (i != ql) && (i < n) then id::(_build_nn_2q_gate_list x n ql g)
+      else if (i == ql) && (i < n-1) then g::(_build_nn_2q_gate_list (x+1) n ql g)
+      else []
+    else
+      if (i != (n-2)) && (i < n-1) then id::(_build_nn_2q_gate_list x n ql g)
+      else if (i == (n-2)) && (i < n) then g::[]
+      else [] in
+  _build_nn_2q_gate_list 0 n ql g

@@ -75,7 +75,7 @@ let swapagator ctrl trgt nqubit =
  * matrix. Howver, I need to double check this to make sure of that. *)
 let get_2q_gate n ctrl trgt g=
   let swpgtr = swapagator ctrl trgt n in
-  let gt = kron_up (_build_nn_2q_gate_list 0 n ctrl g) in
+  let gt = kron_up (build_gate_list_with_2q_gate n ctrl g) in
   M.dot swpgtr (M.dot gt swpgtr)
 
 let apply_gate i qvm =

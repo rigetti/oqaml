@@ -21,5 +21,6 @@ val range : int -> int -> int list
     matrix [M.mat] *)
 val build_gate_list : int -> int -> M.mat -> M.mat list
 
-(** *)
-val _build_nn_2q_gate_list : int -> int -> int -> M.mat -> M.mat list
+(** builds a list of length [int] which at position [int] contains
+    matrix [M.mat] for a two-qubit gate *)
+val build_gate_list_with_2q_gate : int -> int -> M.mat -> M.mat list
