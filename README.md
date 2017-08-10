@@ -42,7 +42,8 @@ R5 (0, 0i)
 R6 (0, 0i)
 R7 (0, 0i)
 
-}
+;
+reg = [|0; 0; 0;|]}
 utop[5]> let is = Q.INSTRUCTIONSET([Q.Y 2; Q.CNOT (0,1); Q.X 0]);;
 val is : Q.instruction_set = Q.INSTRUCTIONSET [Q.Y 2; Q.CNOT (0, 1); Q.X 0]
 utop[6]> Q.apply_instructions is tqvm;;
@@ -57,7 +58,8 @@ R5 (0, 0i)
 R6 (0, 0i)
 R7 (0, 1i)
 
-}
+;
+reg = [|0; 0; 0;|]}
 ```
 
 Note that the instructions in the set `is` are executed from right to left in the way quantum-mechanical notation acts on an intial state.
