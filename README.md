@@ -42,7 +42,8 @@ R5 (0, 0i)
 R6 (0, 0i)
 R7 (0, 0i)
 
-}
+;
+reg = [|0; 0; 0;|]}
 utop[5]> let is = Q.INSTRUCTIONSET([Q.Y 2; Q.CNOT (0,1); Q.X 0]);;
 val is : Q.instruction_set = Q.INSTRUCTIONSET [Q.Y 2; Q.CNOT (0, 1); Q.X 0]
 utop[6]> Q.apply_instructions is tqvm;;
@@ -57,7 +58,8 @@ R5 (0, 0i)
 R6 (0, 0i)
 R7 (0, 1i)
 
-}
+;
+reg = [|0; 0; 0;|]}
 ```
 
 Note that the instructions in the set `is` are executed from right to left in the way quantum-mechanical notation acts on an intial state.
@@ -67,4 +69,34 @@ The test infrastructure uses [Alcotest](https://github.com/mirage/alcotest). To 
 
 ```bash
 make oasis-test
+```
+
+
+## How to cite OQaml
+
+If you use the reference-qvm please cite the repository as follows:
+
+bibTex:
+```tex
+@misc{oqaml2017.0.0.1,
+  author = {Rigetti Computing},
+  title = {OQaml},
+  year = {2017},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/rigetticomputing},
+  commit = {the commit you used}
+}
+```
+
+and the paper outlining the mathematical specification of the quantum-abstract-machine:
+
+bibTeX:
+```tex
+@misc{1608.03355,
+  title={A Practical Quantum Instruction Set Architecture},
+  author={Smith, Robert S and Curtis, Michael J and Zeng, William J},
+  journal={arXiv preprint arXiv:1608.03355},
+  year={2016}
+}
 ```

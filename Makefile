@@ -14,3 +14,5 @@ install:
 	ocaml setup.ml -install
 uninstall:
 	ocamlfind remove oqaml
+doc:
+	ocaml setup.ml -doc
