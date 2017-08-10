@@ -1,7 +1,7 @@
+module M = Owl.Dense.Matrix.C
 open Primitives
 
 let kron_up =
-  let module M = Owl.Dense.Matrix.C in
   List.fold_left M.kron (M.ones 1 1)
 
 let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float
