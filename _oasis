@@ -28,10 +28,10 @@ PostBuildCommand:   echo "Phew ... it is done!"
 
 Library oqaml
   Path:             src
-  BuildTools:       ocamlbuild
+  BuildTools:       ocamlbuild, ocamldoc
   Modules:          Oqaml,
-                    Utils,
                     Primitives
+  InternalModules:  Utils
   BuildDepends:     owl,
                     core_extended
 
@@ -53,3 +53,17 @@ Test lib_test
   Run$:             flag(tests)
   Command:          $test_runner
   WorkingDirectory: tests
+
+# +-------------------------------------------------------------------+
+# | Document                                                          |
+# +-------------------------------------------------------------------+
+
+AlphaFeatures: ocamlbuild_more_args
+Document oqamldoc
+  Title:                API reference for Oqaml
+  Type:                 ocamlbuild (0.4)
+  InstallDir:           doc
+  BuildTools:           ocamldoc
+  XOCamlBuildPath:      .
+  XOCamlBuildLibraries: oqaml
+  XOCamlbuildExtraArgs: "-docflags '-colorize-code -keep-code -charset utf-8 -vmthread -dot'"

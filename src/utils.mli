@@ -24,3 +24,15 @@ val build_gate_list : int -> int -> M.mat -> M.mat list
 (** builds a list of length [int] which at position [int] contains
     matrix [M.mat] for a two-qubit gate *)
 val build_gate_list_with_2q_gate : int -> int -> M.mat -> M.mat list
+
+(** constructs the full swap-matrix for move the qubits [int] and [int] 
+    in a qvm with [int] qubits next to each other *)
+val swapagator : int -> int -> int -> M.mat
+
+(** creates the full gate operator for a qvm with [int] qubits with single
+    qubit gate [M.mat] at position [int] *)
+val get_1q_gate : int -> int -> M.mat -> M.mat
+
+(** creates the full gate operator for a qvm with [int] qubits with two
+    qubit gate [M.mat] for qubits position [int] and [int] *)
+val get_2q_gate : int -> int -> int -> M.mat -> M.mat
