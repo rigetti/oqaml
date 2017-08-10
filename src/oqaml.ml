@@ -38,7 +38,7 @@ let init_qvm num_qubits =
   }
 
 let get_1q_gate n q g =
-  kron_up (_buildList 0 n q g)
+  kron_up (build_gate_list n q g)
 
 
 (* This constructs the full swapagator to bring a target qubit [trgt] next to
@@ -62,13 +62,13 @@ let swapagator ctrl trgt nqubit =
        * which is of dimension 16. We can construct the individual lists by using
        * the buildList func where the qubit indicates the position of the pair,
        * leading to the reduction by 1 in length of the lists.*)
-      if i < dist-1 then (kron_up (_buildList 0 (dist-1) i swap)) ::
+      if i < dist-1 then (kron_up (build_gate_list (dist-1) i swap)) ::
                            (_swapagator_sub_kernels x dist)
       else [] in
     _multi_dot dist (_swapagator_sub_kernels 0 dist) in
-  kron_up ((_buildList 0 (ctrl+1) ctrl id)
+  kron_up ((build_gate_list (ctrl+1) ctrl id)
              @[(_swapagator_kernel (trgt-ctrl))]
-             @(_buildList 0 (nqubit-trgt-1) trgt id))
+             @(build_gate_list (nqubit-trgt-1) trgt id))
 
 (* Currently this only support control qubits left of the target subits. The
  * implementation of reverse is merely a 180 degree rotation of the resulting

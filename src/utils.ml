@@ -20,11 +20,13 @@ let rec range i j =
   if i < j then i :: (range (i+1) j)
   else []
 
-let rec _buildList i n q g =
-  let x = i+1 in
-  if (i != q) && (i < n) then id::(_buildList x n q g)
-  else if (i == q) && (i < n) then g::(_buildList x n q g)
-  else []
+let build_gate_list n q g =
+  let rec _buildList i n q g =
+    let x = i+1 in
+    if (i != q) && (i < n) then id::(_buildList x n q g)
+    else if (i == q) && (i < n) then g::(_buildList x n q g)
+    else [] in
+  _buildList 0 n q g
 
 (* This method construct a list of identies and a single two-qubit gate [g]
  * between a control qubit [ql] and its target at position (ql+1) on a qubit

@@ -19,7 +19,7 @@ module To_test = struct
 
   let kron_up () = U.kron_up [P.id; P.id] = kron_assert
 
-  let build_list () = U._buildList 0 4 1 P.sx = [P.id; P.sx; P.id; P.id]
+  let build_list () = U.build_gate_list 4 1 P.sx = [P.id; P.sx; P.id; P.id]
 
   let int_pow () = U.int_pow 2 5 = 32
 
