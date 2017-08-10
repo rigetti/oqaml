@@ -6,9 +6,9 @@ let kron_up =
 
 let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float
 
-let rec _reverse_bin_rep x =
+let rec binary_rep x =
   let rem = x mod 2 in
-  if x > 0 then rem::(_reverse_bin_rep (x / 2))
+  if x > 0 then rem::(binary_rep (x / 2))
   else []
 
 let rec pad_list n l =

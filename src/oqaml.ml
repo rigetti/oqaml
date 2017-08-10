@@ -27,7 +27,7 @@ type qvm =
 
 let state_list qvm =
   let r = range 0 (int_pow 2 qvm.num_qubits) in
-  List.map (fun x -> pad_list qvm.num_qubits (_reverse_bin_rep x)) r
+  List.map (fun x -> pad_list qvm.num_qubits (binary_rep x)) r
 
 let init_qvm num_qubits =
   let _wf =((int_pow 2 num_qubits) |> V.unit_basis) 0 |> V.transpose in
