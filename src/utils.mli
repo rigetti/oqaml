@@ -6,7 +6,7 @@ val kron_up : M.mat list -> M.mat
 (** b^e for integer values b and e *)
 val int_pow : int -> int -> int
 
-(** creates a binary representation of an integer in reverse order, i.e 
+(** creates a binary representation of an integer in reverse order, i.e
     a[0] * 2^0 + a[1] * 2^1 + a[2] * 2^2 + ... where the exponent is the
     position in the list a *)
 val binary_rep : int -> int list
@@ -25,7 +25,7 @@ val build_gate_list : int -> int -> M.mat -> M.mat list
     matrix [M.mat] for a two-qubit gate *)
 val build_gate_list_with_2q_gate : int -> int -> M.mat -> M.mat list
 
-(** constructs the full swap-matrix for move the qubits [int] and [int] 
+(** constructs the full swap-matrix for move the qubits [int] and [int]
     in a qvm with [int] qubits next to each other *)
 val swapagator : int -> int -> int -> M.mat
 

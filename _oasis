@@ -8,7 +8,7 @@ Version:      0.1
 Description:  OQaml is a reference implementation of the Quil Language in OCaml
 Synopsis:     Scientific computing library
 Authors:      Johannes Otterbach (johannes@rigetti.com)
-License:      PROP
+License:      Apache
 Plugins:      META (0.4)
 OCamlVersion: >= 4.04
 BuildTools:   ocamlbuild
@@ -62,7 +62,6 @@ AlphaFeatures: ocamlbuild_more_args
 Document oqamldoc
   Title:                API reference for Oqaml
   Type:                 ocamlbuild (0.4)
-  InstallDir:           doc
   BuildTools:           ocamldoc
   XOCamlBuildPath:      .
   XOCamlBuildLibraries: oqaml
