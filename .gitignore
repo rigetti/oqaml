@@ -9,4 +9,4 @@ src/oqaml.mldylib
 src/oqaml.mllib
 test_runner.native
 tests/_build/
-*.odoc
+*.odocl
