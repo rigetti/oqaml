@@ -1,4 +1,4 @@
-(** This module implements the basic functionaluty of a QASM (Quantum 
+(** This module implements the basic functionaluty of a QASM (Quantum
     Abstract State Machine) *)
 module M = Owl.Dense.Matrix.C
 module V = Owl.Dense.Vector.C
@@ -34,7 +34,7 @@ type qvm =
     reg: int array;
   }
 
-(** Initializes a clean QVM *)
+(** Initializes a QVM with [int] qubits in their ground-states*)
 val init_qvm : int -> qvm
 
 (** Applies [gate] to a [qvm] resulting in a new [qvm] state *)
@@ -56,6 +56,6 @@ type instruction_set = INSTRUCTIONSET of gate list
 (** Appends a [gate] instrunction to an [instruction_set] *)
 val append_instr : gate -> instruction_set -> instruction_set
 
-(** Applies all gates in an [instruction_set] on a [qvm] resulting in a new 
+(** Applies all gates in an [instruction_set] on a [qvm] resulting in a new
     [qvm] state *)
 val apply_instructions : instruction_set -> qvm -> qvm
