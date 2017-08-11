@@ -5,6 +5,8 @@ module U = Utils
 module C = Complex
 module P = Primitives
 
+let float_tol = 1e-6
+
 let kron_assert = M.of_arrays [| [|C.one; C.zero; C.zero; C.zero |];
                                  [|C.zero; C.one; C.zero; C.zero |];
                                  [|C.zero; C.zero; C.one; C.zero |];
@@ -14,6 +16,8 @@ let rotate_cnot = M.of_arrays [| [|C.zero; C.one; C.zero; C.zero |];
                                  [|C.one; C.zero; C.zero; C.zero |];
                                  [|C.zero; C.zero; C.one; C.zero |];
                                  [|C.zero; C.zero; C.zero; C.one |] |]
+
+let inv_sqrt_two = C.sqrt {C.re=0.5; im=0.0}
 
 module To_test = struct
 
@@ -39,7 +43,19 @@ module To_test = struct
 
   let get_2q_gt () = U.get_2q_gate 3 0 2 P.cnot = M.dot (U.swapagator 0 2 3) (M.dot (U.kron_up [P.cnot; P.id]) (U.swapagator 0 2 3))
 
-  let apply_instr_set () = Q.apply_instructions (Q.INSTRUCTIONSET([Q.Y 2; Q.CNOT (0,1); Q.X 0])) (Q.init_qvm 3) = {Q.num_qubits=3; wf=V.mul_scalar (V.unit_basis 8 7) (C.i) |> V.transpose; reg = Array.make 3 0}
+  let apply_instr_set () = Q.apply_instructions (Q.INSTRUCTIONSET([Q.Y 2; Q.CNOT (0,1); Q.X 0])) (Q.init_qvm 3) =
+                             {Q.num_qubits=3; wf=V.mul_scalar (V.unit_basis 8 7) (C.i) |> V.transpose; reg = Array.make 3 0}
+
+  let measure_qvm () = Q.measure (Q.apply_instructions (Q.INSTRUCTIONSET ([Q.X 1; Q.H 0])) (Q.init_qvm 2)) 1 =
+                         {Q.num_qubits=2 ; wf=(V.of_array [|C.zero; inv_sqrt_two; C.zero; inv_sqrt_two;|]) |> V.transpose; reg =[|0; 1|]}
+
+
+  let measure_all_qvm () = Q.measure_all (Q.apply_instructions (Q.INSTRUCTIONSET ([Q.X 1; Q.X 0])) (Q.init_qvm 2)) 2 = [[1; 1]; [1; 1]]
+
+  let get_probs_qvm () =
+    let meas_prob = Q.get_probs (Q.apply_instructions (Q.INSTRUCTIONSET ([Q.X 1; Q.H 0])) (Q.init_qvm 2)) in
+    let expected_prob = [0.0; 0.5; 0.0; 0.5] in
+    List.fold_left (fun a b -> a && b) true (List.map2 (fun a e -> (abs_float (a -. e) < float_tol)) meas_prob expected_prob);;
 
 end
 
@@ -76,6 +92,15 @@ let get_2q_gt () =
 let apply_instr_set () =
   Alcotest.(check bool) "apply_instr_set" true (To_test.apply_instr_set ())
 
+ let measure_qvm () =
+   Alcotest.(check bool) "measure_qvm" true (To_test.measure_qvm ())
+
+ let measure_all_qvm () =
+   Alcotest.(check bool) "measure_all_qvm" true (To_test.measure_all_qvm ())
+
+let get_probs_qvm () =
+  Alcotest.(check bool) "get_probs_qvm" true (To_test.get_probs_qvm ())
+
 let test_set = [
     "kron up", `Slow, kron_up;
     "build list", `Slow, build_list;
@@ -88,4 +113,7 @@ let test_set = [
     "Dist-3 Swapagator", `Slow, swpgtr2;
     "Dist-2 CNOT gate", `Slow, get_2q_gt;
     "Apply instruction set", `Slow, apply_instr_set;
+    "Measure QVM", `Slow, measure_qvm;
+    "Measure full QVM", `Slow, measure_all_qvm;
+    "Get QVM Probabilities", `Slow, get_probs_qvm;
   ]

@@ -1,8 +1,12 @@
 # OQaml
 
+OQaml is licensed under the Apache 2.0 license.
+
+## Introduction
+
 OQaml is a reference implementation of the Quantum Abstract Machine (QAM) outlined in _R. Smith, M. J. Curtis and W. J. Zeng, "A Practical Quantum Instruction Set Architecture," (2016)_, [arXiv:1608.03355 [quant-ph]](https://arxiv.org/abs/1608.03355). The purpose of OQaml is to demonstrate the conceptual similarities between a classical state machine and a Quantum state machine. It highlights the facts in which functional programming lends itself ideally to the operations on a quantum state as it enforces deliberate actions to force side-effects, i.e. interactions with the environment.
 
-OQaml currently support ProtoQuil (a subset of the full Quil instruction language) which includes one- and two-qubit gate instructions as well as a full state measurement.
+OQaml currently supports ProtoQuil (a subset of the full Quil instruction language) which includes one- and two-qubit gate instructions as well as a full state measurement.
 
 ## Getting started
 ### Setting up the environment

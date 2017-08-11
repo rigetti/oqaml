@@ -83,7 +83,7 @@ let measure_all qvm n =
                                   (get_probs qvm)) in
   let rec sample_state smplr n i =
     let j = i+1 in
-    if j < n then S.sample(smplr)::(sample_state smplr n j)
+    if j <= n then S.sample(smplr)::(sample_state smplr n j)
     else [] in
   sample_state smplr n 0
 
