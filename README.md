@@ -6,7 +6,7 @@ OQaml currently support ProtoQuil (a subset of the full Quil instruction languag
 
 ## Getting started
 ### Setting up the environment
-To hit the ground running to interact with OQaml you need to set up your OCaml environment as described in a short [OQaml setup guide](./docs/oqaml_setup.md). The best way to interact with OQaml is the use of [utop](https://opam.ocaml.org/blog/about-utop/). A more general guide how to set up a good OCaml environment can be found in the [RealWorldOCaml instructions](https://github.com/realworldocaml/book/wiki/Installation-Instructions).
+To hit the ground running to interact with OQaml you need to set up your OCaml environment as described in a short [OQaml setup guide](./readmes/oqaml_setup.md). The best way to interact with OQaml is the use of [utop](https://opam.ocaml.org/blog/about-utop/). A more general guide how to set up a good OCaml environment can be found in the [RealWorldOCaml instructions](https://github.com/realworldocaml/book/wiki/Installation-Instructions).
 
 OQaml actively uses [Owl](https://github.com/ryanrhymes/owl) and JaneStreet's [Core_extended](https://ocaml.janestreet.com/ocaml-core/111.21.00/doc/core_extended/). Both of which can be easily install using [Opam](https://opam.ocaml.org/). Note, however, that some functionality of OQaml requires the latest changes to the development branch of Owl, which is not yet available on Opam.
 

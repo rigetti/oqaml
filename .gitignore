@@ -10,3 +10,4 @@ src/oqaml.mllib
 test_runner.native
 tests/_build/
 *.odocl
+*.docdir
