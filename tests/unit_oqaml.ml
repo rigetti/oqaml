@@ -43,12 +43,22 @@ module To_test = struct
 
   let get_2q_gt () = U.get_2q_gate 3 0 2 P.cnot = M.dot (U.swapagator 0 2 3) (M.dot (U.kron_up [P.cnot; P.id]) (U.swapagator 0 2 3))
 
+  let apply_h () = Q.apply_gate (Q.H 0) (Q.init_qvm 1) =
+                     {Q.num_qubits = 1; wf = (V.of_array [|inv_sqrt_two; inv_sqrt_two|]) |> V.transpose; reg=[|0|] }
+
+  let apply_y () = Q.apply_gate (Q.Y 1) (Q.init_qvm 2) =
+                     {Q.num_qubits = 2; wf = (V.of_array [|C.zero; C.i; C.zero; C.zero|]) |> V.transpose; reg=[|0; 0|] }
+
+  let apply_ry_2 () = Q.apply_gate (Q.RY (3.141592653 /. 2.0, 0)) (Q.init_qvm 1) = Q.apply_gate (Q.H 0) (Q.init_qvm 1)
+
+  let apply_rx_2 () = Q.apply_gate (Q.RX (3.141592653 /. 2.0, 0)) (Q.init_qvm 1) =
+                        {Q.num_qubits = 1; wf = (V.of_array [|inv_sqrt_two; C.mul C.i inv_sqrt_two |> C.neg|]) |> V.transpose; reg=[|0|] }
+
   let apply_instr_set () = Q.apply_instructions (Q.INSTRUCTIONSET([Q.Y 2; Q.CNOT (0,1); Q.X 0])) (Q.init_qvm 3) =
                              {Q.num_qubits=3; wf=V.mul_scalar (V.unit_basis 8 7) (C.i) |> V.transpose; reg = Array.make 3 0}
 
   let measure_qvm () = Q.measure (Q.apply_instructions (Q.INSTRUCTIONSET ([Q.X 1; Q.H 0])) (Q.init_qvm 2)) 1 =
                          {Q.num_qubits=2 ; wf=(V.of_array [|C.zero; inv_sqrt_two; C.zero; inv_sqrt_two;|]) |> V.transpose; reg =[|0; 1|]}
-
 
   let measure_all_qvm () = Q.measure_all (Q.apply_instructions (Q.INSTRUCTIONSET ([Q.X 1; Q.X 0])) (Q.init_qvm 2)) 2 = [[1; 1]; [1; 1]]
 
@@ -89,6 +99,18 @@ let swpgtr2 () =
 let get_2q_gt () =
   Alcotest.(check bool) "get_2q_gt" true (To_test.get_2q_gt ())
 
+let apply_h () =
+  Alcotest.(check bool) "apply_h" true (To_test.apply_h ())
+
+let apply_y () =
+  Alcotest.(check bool) "apply_y" true (To_test.apply_y ())
+
+let apply_ry_2 () =
+  Alcotest.(check bool) "apply_ry_2" true (To_test.apply_ry_2 ())
+
+let apply_rx_2 () =
+  Alcotest.(check bool) "apply_rx_2" true (To_test.apply_rx_2 ())
+
 let apply_instr_set () =
   Alcotest.(check bool) "apply_instr_set" true (To_test.apply_instr_set ())
 
@@ -112,6 +134,10 @@ let test_set = [
     "Dist-2 Swapagator", `Slow, swpgtr;
     "Dist-3 Swapagator", `Slow, swpgtr2;
     "Dist-2 CNOT gate", `Slow, get_2q_gt;
+    "Apply Hadamard", `Slow, apply_h;
+    "Apply Y", `Slow, apply_y;
+    "Apply RX[PI/2]", `Slow, apply_rx_2;
+    "Apply RY[PI/2]", `Slow, apply_ry_2;
     "Apply instruction set", `Slow, apply_instr_set;
     "Measure QVM", `Slow, measure_qvm;
     "Measure full QVM", `Slow, measure_all_qvm;
