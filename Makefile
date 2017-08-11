@@ -10,6 +10,7 @@ all:
 # https://stackoverflow.com/questions/16552834/how-to-use-thread-compiler-flag-with-ocamlbuild
 	ocaml setup.ml -build -tag thread
 install:
+	ocaml setup.ml -build -tag thread
 	ocaml setup.ml -uninstall
 	ocaml setup.ml -install
 uninstall:
