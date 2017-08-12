@@ -54,6 +54,9 @@ module To_test = struct
   let apply_rx_2 () = Q.apply_gate (Q.RX (3.141592653 /. 2.0, 0)) (Q.init_qvm 1) =
                         {Q.num_qubits = 1; wf = (V.of_array [|inv_sqrt_two; C.mul C.i inv_sqrt_two |> C.neg|]) |> V.transpose; reg=[|0|] }
 
+  let apply_rz_2 () = Q.apply_gate (Q.RZ (3.141592653 /. 2.0, 0)) (Q.init_qvm 1) =
+                        {Q.num_qubits = 1; wf = (V.of_array [|C.mul {C.re=1.0; im=0. -. 1.} inv_sqrt_two; C.zero|]) |> V.transpose; reg=[|0|] }
+
   let apply_instr_set () = Q.apply_instructions (Q.INSTRUCTIONSET([Q.Y 2; Q.CNOT (0,1); Q.X 0])) (Q.init_qvm 3) =
                              {Q.num_qubits=3; wf=V.mul_scalar (V.unit_basis 8 7) (C.i) |> V.transpose; reg = Array.make 3 0}
 
@@ -111,6 +114,9 @@ let apply_ry_2 () =
 let apply_rx_2 () =
   Alcotest.(check bool) "apply_rx_2" true (To_test.apply_rx_2 ())
 
+let apply_rz_2 () =
+  Alcotest.(check bool) "apply_rz_2" true (To_test.apply_rz_2 ())
+
 let apply_instr_set () =
   Alcotest.(check bool) "apply_instr_set" true (To_test.apply_instr_set ())
 
@@ -138,6 +144,7 @@ let test_set = [
     "Apply Y", `Slow, apply_y;
     "Apply RX[PI/2]", `Slow, apply_rx_2;
     "Apply RY[PI/2]", `Slow, apply_ry_2;
+    "Apply RZ[PI/2]", `Slow, apply_rz_2;
     "Apply instruction set", `Slow, apply_instr_set;
     "Measure QVM", `Slow, measure_qvm;
     "Measure full QVM", `Slow, measure_all_qvm;
