@@ -68,7 +68,7 @@ module To_test = struct
   let get_probs_qvm () =
     let meas_prob = Q.get_probs (Q.apply_instructions (Q.INSTRUCTIONSET ([Q.X 1; Q.H 0])) (Q.init_qvm 2)) in
     let expected_prob = [0.0; 0.5; 0.0; 0.5] in
-    List.fold_left (fun a b -> a && b) true (List.map2 (fun a e -> (abs_float (a -. e) < float_tol)) meas_prob expected_prob);;
+    List.for_all2 (fun a e -> (abs_float (a -. e) < float_tol)) meas_prob expected_prob;;
 
 end
 
