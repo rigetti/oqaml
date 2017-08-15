@@ -85,3 +85,23 @@ let get_2q_gate n ctrl trgt g=
   let swpgtr = swapagator ctrl trgt n in
   let gt = kron_up (build_gate_list_with_2q_gate n ctrl g) in
   M.dot swpgtr (M.dot gt swpgtr)
+
+let flip x arr =
+  let bit_flip b = (1 - b) in
+  arr.(x) <- bit_flip arr.(x);
+  arr
+
+let cand x y arr =
+  let bit_and ctr tar = if (ctr == 1 && tar == 1) then 1 else 0 in
+  arr.(y) <-  bit_and arr.(x) arr.(y);
+  arr
+
+let cor x y arr =
+  let bit_or ctr tar = if (ctr == 0 && tar == 0) then 0 else 1 in
+  arr.(y) <- bit_or arr.(x) arr.(y);
+  arr
+
+let xor x y arr =
+  let bit_xor ctr tar = if (ctr == tar) then 0 else 1 in
+  arr.(y) <- bit_xor arr.(x) arr.(y);
+  arr
