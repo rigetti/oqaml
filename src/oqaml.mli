@@ -22,6 +22,7 @@ type gate =
   | NOT of int
   | AND of int * int
   | OR of int * int
+  | XOR of int * int
 
 (** The actual QVM type as a record *)
 type qvm =

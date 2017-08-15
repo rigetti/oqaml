@@ -36,3 +36,19 @@ val get_1q_gate : int -> int -> M.mat -> M.mat
 (** creates the full gate operator for a qvm with [int] qubits with two
     qubit gate [M.mat] for qubits position [int] and [int] *)
 val get_2q_gate : int -> int -> int -> M.mat -> M.mat
+
+(** flips a classical bit  encoded as 0 and 1 at position [int] in a
+    register [arr] *)
+val flip : int -> int array -> int array
+
+(** computes the classical AND between two bits encoded as 0 and 1 at
+    position [int] and [int] of a register [arr] *)
+val cand : int -> int -> int array -> int array
+
+(** computes the classical OR between two bits encoded as 0 and 1 at
+    position [int] and [int] of a register [arr] *)
+val cor : int -> int -> int array -> int array
+
+(** computes the classical XOR between two bits encoded as 0 and 1 at
+    position [int] and [int] of a register [arr] *)
+val xor : int -> int -> int array -> int array

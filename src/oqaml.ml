@@ -23,16 +23,13 @@ type gate =
   | NOT of int
   | AND of int * int
   | OR of int * int
+  | XOR of int * int
 
 type qvm =
   { num_qubits: int;
     wf : V.vec;
     reg: int array;
   }
-
-let state_list qvm =
-  let r = range 0 (int_pow 2 qvm.num_qubits) in
-  List.map (fun x -> pad_list qvm.num_qubits (binary_rep x)) r
 
 let init_qvm ?(reg_size = 0) num_qubits =
   let reg_size = if reg_size < num_qubits then num_qubits else reg_size in
@@ -63,25 +60,6 @@ let measure qvm idx =
      wf = V.div_scalar (M.dot p1 qvm.wf)
             ({C.re=Math.sqrt (1. -. prob_0); im=0.});
      reg = _reg}
-
-let bool_of_int i = if i==1 then true else false
-let int_of_bool b = if b then 1 else 0
-
-let bit_flip b = (1 - b)
-let bit_and ctr tar = if (ctr == 1 && tar == 1) then 1 else 0
-let bit_or ctr tar = if (ctr == 1 || tar == 1) then 1 else 0
-
-let flip x arr =
-  arr.(x) <- bit_flip arr.(x);
-  arr
-
-let cand x y arr =
-  arr.(y) <-  bit_and arr.(x) arr.(y);
-  arr
-
-let cor x y arr =
-  arr.(y) <- bit_or arr.(x) arr.(y);
-  arr
 
 let rec apply i qvm =
   match i with
@@ -127,6 +105,9 @@ let rec apply i qvm =
   | OR(x, y) -> {num_qubits=qvm.num_qubits;
                  wf = qvm.wf;
                  reg = cor x y (A.copy qvm.reg)}
+  | XOR(x, y) -> {num_qubits=qvm.num_qubits;
+                 wf = qvm.wf;
+                 reg = xor x y (A.copy qvm.reg)}
 
 let get_probs qvm =
   qvm.wf |> V.to_array |> Array.to_list
@@ -134,6 +115,9 @@ let get_probs qvm =
 
 let measure_all qvm n =
   let module S = Core_extended.Sampler in
+  let state_list qvm =
+    let r = range 0 (int_pow 2 qvm.num_qubits) in
+    List.map (fun x -> pad_list qvm.num_qubits (binary_rep x)) r in
   let smplr = S.create (List.map2 (fun x y -> (x, y))
                                   (state_list qvm)
                                   (get_probs qvm)) in
@@ -142,4 +126,3 @@ let measure_all qvm n =
     if j <= n then S.sample(smplr)::(sample_state smplr n j)
     else [] in
   sample_state smplr n 0
-
