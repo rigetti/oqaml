@@ -18,7 +18,11 @@ type gate =
   | RZ of float * int
   | CNOT of int * int
   | SWAP of int * int
-  | PROG of gate list
+  | CIRCUIT of gate list
+  | MEASURE of int
+  | NOT of int
+  | AND of int * int
+  | OR of int * int
 
 type qvm =
   { num_qubits: int;
@@ -30,13 +34,54 @@ let state_list qvm =
   let r = range 0 (int_pow 2 qvm.num_qubits) in
   List.map (fun x -> pad_list qvm.num_qubits (binary_rep x)) r
 
-let init_qvm num_qubits =
+let init_qvm ?(reg_size = 0) num_qubits =
+  let reg_size = if reg_size < num_qubits then num_qubits else reg_size in
   let _wf =((int_pow 2 num_qubits) |> V.unit_basis) 0 |> V.transpose in
-  let _reg = A.make num_qubits 0 in
+  let _reg = A.make reg_size 0 in
   {num_qubits = num_qubits;
    wf = _wf;
    reg = _reg;
   }
+
+let measure qvm idx =
+  let p0 = get_1q_gate qvm.num_qubits idx proj_0 in
+  let p1 = get_1q_gate qvm.num_qubits idx proj_1 in
+  let exp_val = V.dot (V.map C.conj qvm.wf |> V.transpose) (V.dot p0 qvm.wf) in
+  let prob_0 = Array.get (V.to_array exp_val) 0 |> (fun x -> x.re) in
+  let module R = Random in
+  let rejection_prob = R.float 1. in
+  if rejection_prob < prob_0 then
+    let _reg = qvm.reg in
+    A.set _reg idx 0;
+    {num_qubits=qvm.num_qubits;
+     wf = V.div_scalar (V.dot p0 qvm.wf) ({C.re=Math.sqrt prob_0; im=0.});
+     reg = _reg}
+  else
+    let _reg = qvm.reg in
+    A.set _reg idx 1;
+    {num_qubits=qvm.num_qubits;
+     wf = V.div_scalar (M.dot p1 qvm.wf)
+            ({C.re=Math.sqrt (1. -. prob_0); im=0.});
+     reg = _reg}
+
+let bool_of_int i = if i==1 then true else false
+let int_of_bool b = if b then 1 else 0
+
+let bit_flip b = (1 - b)
+let bit_and ctr tar = if (ctr == 1 && tar == 1) then 1 else 0
+let bit_or ctr tar = if (ctr == 1 || tar == 1) then 1 else 0
+
+let flip x arr =
+  arr.(x) <- bit_flip arr.(x);
+  arr
+
+let cand x y arr =
+  arr.(y) <-  bit_and arr.(x) arr.(y);
+  arr
+
+let cor x y arr =
+  arr.(y) <- bit_or arr.(x) arr.(y);
+  arr
 
 let rec apply i qvm =
   match i with
@@ -70,8 +115,18 @@ let rec apply i qvm =
   | SWAP(x,y) -> {num_qubits=qvm.num_qubits;
                   wf = V.dot (get_2q_gate qvm.num_qubits x y swap) qvm.wf;
                   reg = qvm.reg}
-  | PROG(hd :: tl) -> apply hd (apply (PROG(tl)) qvm)
-  | PROG([]) -> qvm
+  | CIRCUIT(hd :: tl) -> apply hd (apply (CIRCUIT(tl)) qvm)
+  | CIRCUIT([]) -> qvm;
+  | MEASURE(x) -> measure qvm x;
+  | NOT(x) -> {num_qubits=qvm.num_qubits;
+               wf = qvm.wf;
+               reg = flip x (A.copy qvm.reg)};
+  | AND(x, y) -> {num_qubits=qvm.num_qubits;
+                  wf = qvm.wf;
+                  reg = cand x y (A.copy qvm.reg)};
+  | OR(x, y) -> {num_qubits=qvm.num_qubits;
+                 wf = qvm.wf;
+                 reg = cor x y (A.copy qvm.reg)}
 
 let get_probs qvm =
   qvm.wf |> V.to_array |> Array.to_list
@@ -88,60 +143,3 @@ let measure_all qvm n =
     else [] in
   sample_state smplr n 0
 
-let measure qvm idx =
-  let p0 = get_1q_gate qvm.num_qubits idx proj_0 in
-  let p1 = get_1q_gate qvm.num_qubits idx proj_1 in
-  let exp_val = V.dot (V.map C.conj qvm.wf |> V.transpose) (V.dot p0 qvm.wf) in
-  let prob_0 = Array.get (V.to_array exp_val) 0 |> (fun x -> x.re) in
-  let module R = Random in
-  let rejection_prob = R.float 1. in
-  if rejection_prob < prob_0 then
-    let _reg = qvm.reg in
-    A.set _reg idx 0;
-    {num_qubits=qvm.num_qubits;
-     wf = V.div_scalar (V.dot p0 qvm.wf) ({C.re=Math.sqrt prob_0; im=0.});
-     reg = _reg}
-  else
-    let _reg = qvm.reg in
-    A.set _reg idx 1;
-    {num_qubits=qvm.num_qubits;
-     wf = V.div_scalar (M.dot p1 qvm.wf) ({C.re=Math.sqrt (1. -. prob_0); im=0.});
-     reg = _reg}
-
-
-(** Classical Bit Register *)
-type instr =
-  NOT of int
-  | AND of int * int
-  | OR of int * int
-
-type register = REG of int list
-
-let bool_of_int i = if i==1 then true else false
-let int_of_bool b = if b then 1 else 0
-
-let get_reg_vals reg =
-    match reg with
-    | REG(lst) -> Array.of_list lst
-
-let bit_flip b = (1 - b)
-let bit_and ctr tar = if (ctr == 1 && tar == 1) then 1 else 0
-let bit_or ctr tar = if (ctr == 1 || tar == 1) then 1 else 0
-
-let flip x arr =
-  arr.(x) <- bit_flip arr.(x);
-  arr
-
-let cand x y arr =
-  arr.(y) <-  bit_and arr.(x) arr.(y);
-  arr
-
-let cor x y arr =
-  arr.(y) <- bit_or arr.(x) arr.(y);
-  arr
-
-let apply_instr i r =
-  match i with
-  | NOT(x) -> REG(Array.to_list(flip x (get_reg_vals r)))
-  | AND(x, y) -> REG(Array.to_list(cand x y (get_reg_vals r)))
-  | OR(x, y) -> REG(Array.to_list(cor x y (get_reg_vals r)))
