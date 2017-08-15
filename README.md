@@ -54,9 +54,9 @@ R7 (0, 0i)
 
 ;
 reg = [|0; 0; 0;|]}
-utop[5]> let is = Q.INSTRUCTIONSET([Q.Y 2; Q.CNOT (0,1); Q.X 0]);;
-val is : Q.instruction_set = Q.INSTRUCTIONSET [Q.Y 2; Q.CNOT (0, 1); Q.X 0]
-utop[6]> Q.apply_instructions is tqvm;;
+utop[5]> let prog = Q.PROG([Q.Y 2; Q.CNOT (0,1); Q.X 0]);;
+val prog : Q.gate = Q.PROG [Q.Y 2; Q.CNOT (0, 1); Q.X 0]
+utop[6]> Q.apply prog tqvm;;
 - : Q.qvm = {Q.num_qubits = 3; wf =
         C0
 R0 (0, 0i)
@@ -72,7 +72,7 @@ R7 (0, 1i)
 reg = [|0; 0; 0;|]}
 ```
 
-Note that the instructions in the set `is` are executed from right to left in the way quantum-mechanical notation acts on an intial state.
+Note that the gates in the set `prog` are executed from right to left in the way quantum-mechanical notation acts on a state.
 
 ## Building the docs
 To build the API docs you can run
