@@ -8,7 +8,7 @@ open Primitives
 
 (** QVM supporting ProtoQuil *)
 type gate =
-    I of int
+  | I of int
   | X of int
   | Y of int
   | Z of int
@@ -16,8 +16,9 @@ type gate =
   | RX of float * int
   | RY of float * int
   | RZ of float * int
-  | CNOT of int*int
-  | SWAP of int*int
+  | CNOT of int * int
+  | SWAP of int * int
+  | PROG of gate list
 
 type qvm =
   { num_qubits: int;
@@ -37,9 +38,7 @@ let init_qvm num_qubits =
    reg = _reg;
   }
 
-
-
-let apply_gate i qvm =
+let rec apply i qvm =
   match i with
   | I(x) -> {num_qubits=qvm.num_qubits;
              wf = V.dot (get_1q_gate qvm.num_qubits x id) qvm.wf;
@@ -71,6 +70,8 @@ let apply_gate i qvm =
   | SWAP(x,y) -> {num_qubits=qvm.num_qubits;
                   wf = V.dot (get_2q_gate qvm.num_qubits x y swap) qvm.wf;
                   reg = qvm.reg}
+  | PROG(hd :: tl) -> apply hd (apply (PROG(tl)) qvm)
+  | PROG([]) -> qvm
 
 let get_probs qvm =
   qvm.wf |> V.to_array |> Array.to_list
@@ -107,17 +108,6 @@ let measure qvm idx =
      wf = V.div_scalar (M.dot p1 qvm.wf) ({C.re=Math.sqrt (1. -. prob_0); im=0.});
      reg = _reg}
 
-type instruction_set = INSTRUCTIONSET of gate list
-let append_instr g is =
-  match is with
-  | INSTRUCTIONSET([]) -> INSTRUCTIONSET([g])
-  | INSTRUCTIONSET(x)  -> INSTRUCTIONSET([g]@x)
-
-let rec apply_instructions is qvm =
-  match is with
-  | INSTRUCTIONSET([]) -> qvm
-  | INSTRUCTIONSET(x) -> List.fold_right (fun z y -> apply_gate z y ) x qvm
-
 
 (** Classical Bit Register *)
 type instr =
@@ -150,7 +140,7 @@ let cor x y arr =
   arr.(y) <- bit_or arr.(x) arr.(y);
   arr
 
-let apply i r =
+let apply_instr i r =
   match i with
   | NOT(x) -> REG(Array.to_list(flip x (get_reg_vals r)))
   | AND(x, y) -> REG(Array.to_list(cand x y (get_reg_vals r)))

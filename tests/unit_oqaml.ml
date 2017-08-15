@@ -43,30 +43,30 @@ module To_test = struct
 
   let get_2q_gt () = U.get_2q_gate 3 0 2 P.cnot = M.dot (U.swapagator 0 2 3) (M.dot (U.kron_up [P.cnot; P.id]) (U.swapagator 0 2 3))
 
-  let apply_h () = Q.apply_gate (Q.H 0) (Q.init_qvm 1) =
+  let apply_h () = Q.apply (Q.H 0) (Q.init_qvm 1) =
                      {Q.num_qubits = 1; wf = (V.of_array [|inv_sqrt_two; inv_sqrt_two|]) |> V.transpose; reg=[|0|] }
 
-  let apply_y () = Q.apply_gate (Q.Y 1) (Q.init_qvm 2) =
+  let apply_y () = Q.apply (Q.Y 1) (Q.init_qvm 2) =
                      {Q.num_qubits = 2; wf = (V.of_array [|C.zero; C.i; C.zero; C.zero|]) |> V.transpose; reg=[|0; 0|] }
 
-  let apply_ry_2 () = Q.apply_gate (Q.RY (3.141592653 /. 2.0, 0)) (Q.init_qvm 1) = Q.apply_gate (Q.H 0) (Q.init_qvm 1)
+  let apply_ry_2 () = Q.apply (Q.RY (3.141592653 /. 2.0, 0)) (Q.init_qvm 1) = Q.apply (Q.H 0) (Q.init_qvm 1)
 
-  let apply_rx_2 () = Q.apply_gate (Q.RX (3.141592653 /. 2.0, 0)) (Q.init_qvm 1) =
+  let apply_rx_2 () = Q.apply (Q.RX (3.141592653 /. 2.0, 0)) (Q.init_qvm 1) =
                         {Q.num_qubits = 1; wf = (V.of_array [|inv_sqrt_two; C.mul C.i inv_sqrt_two |> C.neg|]) |> V.transpose; reg=[|0|] }
 
-  let apply_rz_2 () = Q.apply_gate (Q.RZ (3.141592653 /. 2.0, 0)) (Q.init_qvm 1) =
+  let apply_rz_2 () = Q.apply (Q.RZ (3.141592653 /. 2.0, 0)) (Q.init_qvm 1) =
                         {Q.num_qubits = 1; wf = (V.of_array [|C.mul {C.re=1.0; im=0. -. 1.} inv_sqrt_two; C.zero|]) |> V.transpose; reg=[|0|] }
 
-  let apply_instr_set () = Q.apply_instructions (Q.INSTRUCTIONSET([Q.Y 2; Q.CNOT (0,1); Q.X 0])) (Q.init_qvm 3) =
+  let apply_instr_set () = Q.apply (Q.PROG([Q.Y 2; Q.CNOT (0,1); Q.X 0])) (Q.init_qvm 3) =
                              {Q.num_qubits=3; wf=V.mul_scalar (V.unit_basis 8 7) (C.i) |> V.transpose; reg = Array.make 3 0}
 
-  let measure_qvm () = Q.measure (Q.apply_instructions (Q.INSTRUCTIONSET ([Q.X 1; Q.H 0])) (Q.init_qvm 2)) 1 =
+  let measure_qvm () = Q.measure (Q.apply (Q.PROG ([Q.X 1; Q.H 0])) (Q.init_qvm 2)) 1 =
                          {Q.num_qubits=2 ; wf=(V.of_array [|C.zero; inv_sqrt_two; C.zero; inv_sqrt_two;|]) |> V.transpose; reg =[|0; 1|]}
 
-  let measure_all_qvm () = Q.measure_all (Q.apply_instructions (Q.INSTRUCTIONSET ([Q.X 1; Q.X 0])) (Q.init_qvm 2)) 2 = [[1; 1]; [1; 1]]
+  let measure_all_qvm () = Q.measure_all (Q.apply (Q.PROG ([Q.X 1; Q.X 0])) (Q.init_qvm 2)) 2 = [[1; 1]; [1; 1]]
 
   let get_probs_qvm () =
-    let meas_prob = Q.get_probs (Q.apply_instructions (Q.INSTRUCTIONSET ([Q.X 1; Q.H 0])) (Q.init_qvm 2)) in
+    let meas_prob = Q.get_probs (Q.apply (Q.PROG ([Q.X 1; Q.H 0])) (Q.init_qvm 2)) in
     let expected_prob = [0.0; 0.5; 0.0; 0.5] in
     List.for_all2 (fun a e -> (abs_float (a -. e) < float_tol)) meas_prob expected_prob;;
 
@@ -145,7 +145,7 @@ let test_set = [
     "Apply RX[PI/2]", `Slow, apply_rx_2;
     "Apply RY[PI/2]", `Slow, apply_ry_2;
     "Apply RZ[PI/2]", `Slow, apply_rz_2;
-    "Apply instruction set", `Slow, apply_instr_set;
+    "Apply PROG gate", `Slow, apply_instr_set;
     "Measure QVM", `Slow, measure_qvm;
     "Measure full QVM", `Slow, measure_all_qvm;
     "Get QVM Probabilities", `Slow, get_probs_qvm;
