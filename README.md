@@ -54,8 +54,8 @@ R7 (0, 0i)
 
 ;
 reg = [|0; 0; 0;|]}
-utop[5]> let prog = Q.PROG([Q.Y 2; Q.CNOT (0,1); Q.X 0]);;
-val prog : Q.gate = Q.PROG [Q.Y 2; Q.CNOT (0, 1); Q.X 0]
+utop[5]> let prog = Q.CIRCUIT([Q.Y 2; Q.CNOT (0,1); Q.X 0]);;
+val prog : Q.gate = Q.CIRCUIT [Q.Y 2; Q.CNOT (0, 1); Q.X 0]
 utop[6]> Q.apply prog tqvm;;
 - : Q.qvm = {Q.num_qubits = 3; wf =
         C0
