@@ -13,6 +13,7 @@ type gate =
   | Y of int
   | Z of int
   | H of int
+  | PHASE of float
   | RX of float * int
   | RY of float * int
   | RZ of float * int
@@ -63,49 +64,52 @@ let measure qvm idx =
 
 let rec apply i qvm =
   match i with
-  | I(x) -> {num_qubits=qvm.num_qubits;
+  | I(x) -> {num_qubits = qvm.num_qubits;
              wf = V.dot (get_1q_gate qvm.num_qubits x id) qvm.wf;
              reg = qvm.reg}
-  | X(x) -> {num_qubits=qvm.num_qubits;
+  | X(x) -> {num_qubits = qvm.num_qubits;
              wf = V.dot (get_1q_gate qvm.num_qubits x sx) qvm.wf;
              reg = qvm.reg}
-  | Y(x) -> {num_qubits=qvm.num_qubits;
+  | Y(x) -> {num_qubits = qvm.num_qubits;
              wf = V.dot (get_1q_gate qvm.num_qubits x sy) qvm.wf;
              reg = qvm.reg}
-  | Z(x) -> {num_qubits=qvm.num_qubits;
+  | Z(x) -> {num_qubits = qvm.num_qubits;
              wf = V.dot (get_1q_gate qvm.num_qubits x sz) qvm.wf;
              reg = qvm.reg}
-  | H(x) -> {num_qubits=qvm.num_qubits;
+  | H(x) -> {num_qubits = qvm.num_qubits;
              wf = V.dot (get_1q_gate qvm.num_qubits x h) qvm.wf;
              reg = qvm.reg}
-  | RX(t,x) -> {num_qubits=qvm.num_qubits;
+  | PHASE(t) -> {num_qubits = qvm.num_qubits;
+                   wf = V.mul_scalar qvm.wf (C.polar 1. t);
+                   reg = qvm.reg}
+  | RX(t,x) -> {num_qubits = qvm.num_qubits;
                 wf = V.dot (get_1q_gate qvm.num_qubits x (rx t)) qvm.wf;
                 reg = qvm.reg}
-  | RY(t,x) -> {num_qubits=qvm.num_qubits;
+  | RY(t,x) -> {num_qubits = qvm.num_qubits;
                 wf = V.dot (get_1q_gate qvm.num_qubits x (ry t)) qvm.wf;
                 reg = qvm.reg}
-  | RZ(t,x) -> {num_qubits=qvm.num_qubits;
+  | RZ(t,x) -> {num_qubits = qvm.num_qubits;
                 wf = V.dot (get_1q_gate qvm.num_qubits x (rz t)) qvm.wf;
                 reg = qvm.reg}
-  | CNOT(x,y) -> {num_qubits=qvm.num_qubits;
+  | CNOT(x,y) -> {num_qubits = qvm.num_qubits;
                   wf = V.dot (get_2q_gate qvm.num_qubits x y cnot) qvm.wf;
                   reg = qvm.reg}
-  | SWAP(x,y) -> {num_qubits=qvm.num_qubits;
+  | SWAP(x,y) -> {num_qubits = qvm.num_qubits;
                   wf = V.dot (get_2q_gate qvm.num_qubits x y swap) qvm.wf;
                   reg = qvm.reg}
-  | CIRCUIT(hd :: tl) -> apply hd (apply (CIRCUIT(tl)) qvm)
+  | CIRCUIT(hd :: tl) -> apply hd (apply (CIRCUIT (tl)) qvm)
   | CIRCUIT([]) -> qvm;
   | MEASURE(x) -> measure qvm x;
-  | NOT(x) -> {num_qubits=qvm.num_qubits;
+  | NOT(x) -> {num_qubits = qvm.num_qubits;
                wf = qvm.wf;
                reg = flip x (A.copy qvm.reg)};
-  | AND(x, y) -> {num_qubits=qvm.num_qubits;
+  | AND(x, y) -> {num_qubits = qvm.num_qubits;
                   wf = qvm.wf;
                   reg = cand x y (A.copy qvm.reg)};
-  | OR(x, y) -> {num_qubits=qvm.num_qubits;
+  | OR(x, y) -> {num_qubits = qvm.num_qubits;
                  wf = qvm.wf;
                  reg = cor x y (A.copy qvm.reg)}
-  | XOR(x, y) -> {num_qubits=qvm.num_qubits;
+  | XOR(x, y) -> {num_qubits = qvm.num_qubits;
                  wf = qvm.wf;
                  reg = xor x y (A.copy qvm.reg)}
 
