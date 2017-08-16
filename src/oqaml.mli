@@ -12,6 +12,7 @@ type gate =
   | Y of int
   | Z of int
   | H of int
+  | PHASE of float
   | RX of float * int
   | RY of float * int
   | RZ of float * int
