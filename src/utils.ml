@@ -6,15 +6,13 @@ let kron_up =
 
 let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float
 
-let binary_rep x =
-  let rec rev_binary_rep x =
-    let rem = x mod 2 in
-    if x > 0 then rem::(rev_binary_rep (x / 2))
-    else [] in
-  List.rev (rev_binary_rep x)
+let rec binary_rep x =
+  let rem = x mod 2 in
+  if x > 0 then rem::(binary_rep (x / 2))
+  else []
 
 let rec pad_list n l =
-  let pl = [0]@l in
+  let pl = l@[0] in
   if List.length(pl) <= n then pad_list n pl
   else l
 

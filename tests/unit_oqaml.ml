@@ -44,9 +44,9 @@ module To_test = struct
 
   let range () = U.range 2 5 = [2;3;4]
 
-  let bin_rep () = U.binary_rep 13 = [1;1;0;1]
+  let bin_rep () = U.binary_rep 11 = [1;1;0;1]
 
-  let pad_list () = U.pad_list 4 [1; 1] = [0; 0; 1; 1]
+  let pad_list () = U.pad_list 4 [1; 1] = [1; 1; 0; 0]
 
   let nn_2q_gate_list () = U.build_gate_list_with_2q_gate 3 1 P.cnot = [P.id; P.cnot]
 
