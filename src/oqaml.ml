@@ -121,7 +121,7 @@ let measure_all qvm n =
   let module S = Core_extended.Sampler in
   let state_list qvm =
     let r = range 0 (int_pow 2 qvm.num_qubits) in
-    List.map (fun x -> (pad_list qvm.num_qubits (binary_rep x)) |> List.rev) r in
+    List.map (fun x -> pad_list qvm.num_qubits (binary_rep x) |> List.rev) r in
   let smplr = S.create (List.map2 (fun x y -> (x, y))
                                   (state_list qvm)
                                   (get_probs qvm)) in
