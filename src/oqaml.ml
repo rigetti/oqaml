@@ -49,14 +49,14 @@ let measure qvm idx =
   let module R = Random in
   let rejection_prob = R.float 1. in
   if rejection_prob < prob_0 then
-    let _reg = qvm.reg in
-    A.set _reg idx 0;
+    let _reg = A.copy qvm.reg in
+    _reg.(idx) <- 0;
     {num_qubits=qvm.num_qubits;
      wf = V.div_scalar (V.dot p0 qvm.wf) ({C.re=Math.sqrt prob_0; im=0.});
      reg = _reg}
   else
-    let _reg = qvm.reg in
-    A.set _reg idx 1;
+    let _reg = A.copy qvm.reg in
+    _reg.(idx) <- 1;
     {num_qubits=qvm.num_qubits;
      wf = V.div_scalar (M.dot p1 qvm.wf)
             ({C.re=Math.sqrt (1. -. prob_0); im=0.});
