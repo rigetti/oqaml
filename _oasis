@@ -65,4 +65,4 @@ Document oqamldoc
   BuildTools:           ocamldoc
   XOCamlBuildPath:      .
   XOCamlBuildLibraries: oqaml
-  XOCamlbuildExtraArgs: "-docflags '-colorize-code -keep-code -charset utf-8 -vmthread -dot'"
+  XOCamlbuildExtraArgs: "-docflags '-colorize-code -keep-code -charset utf-8 -vmthread'"

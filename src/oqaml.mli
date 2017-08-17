@@ -1,36 +1,43 @@
-(** This module implements the basic functionaluty of a QASM (Quantum
-    Abstract State Machine) *)
+(** This module implements the basic functionality of the
+    {b O}Caml 
+    {b Q}uantum
+    {b A}bastract
+    {b M}achine
+    {b L}anguange, 
+    a QASM (Quantum Abstract State Machine) *)
 module M = Owl.Dense.Matrix.C
 module V = Owl.Dense.Vector.C
 
-
-(** Gate operations on a qvm containing a classical bit register and a quantum
-    state both indexed by integers. *)
-type gate =
-  | I of int
-  | X of int
-  | Y of int
-  | Z of int
-  | H of int
-  | PHASE of float
-  | RX of float * int
-  | RY of float * int
-  | RZ of float * int
-  | CNOT of int * int
-  | SWAP of int * int
-  | CIRCUIT of gate list
-  | MEASURE of int
-  | NOT of int
-  | AND of int * int
-  | OR of int * int
-  | XOR of int * int
-
-(** The actual QVM type as a record *)
+(** The QVM is a record type containing the number of qubits, a wave-function
+    connected to the quantum state of the quibits and a classical register that 
+    can be used to read out the qubits into classical bits *)
 type qvm =
   { num_qubits: int;
     wf: V.vec;
     reg: int array;
   }
+
+(** Gate operations on a qvm containing operations on the classical bit register
+    and the quantum state. The target qubits and bits are indexed by integers
+    denoting their position in the wave-function and classical register. *)
+type gate =
+  | I of int (** Reversible quantum operation on the wave-function*)
+  | X of int (** Reversible quantum operation on the wave-function*)
+  | Y of int (** Reversible quantum operation on the wave-function*)
+  | Z of int (** Reversible quantum operation on the wave-function*)
+  | H of int (** Reversible quantum operation on the wave-function*)
+  | PHASE of float (** Reversible quantum operation on the wave-function*)
+  | RX of float * int (** Reversible quantum operation on the wave-function*)
+  | RY of float * int (** Reversible quantum operation on the wave-function*)
+  | RZ of float * int (** Reversible quantum operation on the wave-function*)
+  | CNOT of int * int (** Reversible quantum operation on the wave-function*)
+  | SWAP of int * int (** Reversible quantum operation on the wave-function*)
+  | CIRCUIT of gate list (** Recursive type for circuits *)
+  | MEASURE of int (** Projective measurement gate *)
+  | NOT of int (** Classic operation on the bit register *)
+  | AND of int * int (** Classic operation on the bit register *)
+  | OR of int * int (** Classic operation on the bit register *)
+  | XOR of int * int (** Classic operation on the bit register *)
 
 (** Initializes a QVM with a classical register of [reg_size] bist and [int]
     qubits in their ground-states*)
@@ -42,5 +49,6 @@ val apply : gate -> qvm -> qvm
 (** Returns the probabilities to find the [qvm] in a certain quantum state *)
 val get_probs : qvm -> float list
 
-(** Measures all qubits in the [qvm] [int]-times and returns the results *)
+(** Measures all qubits in the [qvm] [int]-times and returns the results in a
+    [list] of [int list]*)
 val measure_all : qvm -> int -> int list list

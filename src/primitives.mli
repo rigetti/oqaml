@@ -1,3 +1,6 @@
+(** This module defines the necessary primitive matrix representations that are
+    needed to represent and construct arbitrary one- and two-qubit gates used
+    in {!module:Oqaml} *)
 module M = Owl.Dense.Matrix.C
 
 (** Identiy operator for single qubit *)
