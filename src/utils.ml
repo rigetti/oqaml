@@ -83,9 +83,6 @@ let swapagator ctrl trgt nqubit =
 let get_1q_gate n q g =
   kron_up (build_gate_list n q g)
 
-(* Currently this only support control qubits left of the target subits. The
- * implementation of reverse is merely a 180 degree rotation of the resulting
- * matrix. Howver, I need to double check this to make sure of that. *)
 let get_2q_gate n ctrl trgt g=
   let swpgtr = swapagator ctrl trgt n in
   let gt =
