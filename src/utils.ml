@@ -70,21 +70,25 @@ let swapagator ctrl trgt nqubit =
                            (_swapagator_sub_kernels x dist)
       else [] in
     _multi_dot dist (_swapagator_sub_kernels 0 dist) in
-  kron_up ((build_gate_list (ctrl+1) ctrl id)
-             @[(_swapagator_kernel (trgt-ctrl))]
-             @(build_gate_list (nqubit-trgt-1) trgt id))
+  if ctrl < trgt then
+    kron_up ((build_gate_list (ctrl+1) ctrl id)
+               @[(_swapagator_kernel (trgt-ctrl))]
+               @(build_gate_list (nqubit-trgt-1) trgt id))
+  else
+    kron_up ((build_gate_list (trgt) (trgt) id)
+               @[(_swapagator_kernel (ctrl - trgt + 1))]
+               @(build_gate_list (nqubit-ctrl-1) (ctrl) id))
 
 
 let get_1q_gate n q g =
   kron_up (build_gate_list n q g)
 
-(* Currently this only support control qubits left of the target subits. The
- * implementation of reverse is merely a 180 degree rotation of the resulting
- * matrix. Howver, I need to double check this to make sure of that. *)
 let get_2q_gate n ctrl trgt g=
   let swpgtr = swapagator ctrl trgt n in
-  let gt = kron_up (build_gate_list_with_2q_gate n ctrl g) in
-  M.dot swpgtr (M.dot gt swpgtr)
+  let gt =
+    if ctrl < trgt then kron_up (build_gate_list_with_2q_gate n ctrl g)
+    else kron_up (build_gate_list_with_2q_gate n trgt g) in
+  M.dot (M.transpose swpgtr) (M.dot gt swpgtr)
 
 let flip x arr =
   let bit_flip b = (1 - b) in

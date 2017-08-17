@@ -58,6 +58,77 @@ module To_test = struct
 
   let get_2q_gt () = U.get_2q_gate 3 0 2 P.cnot = M.dot (U.swapagator 0 2 3) (M.dot (U.kron_up [P.cnot; P.id]) (U.swapagator 0 2 3))
 
+  let apply_cnot () =
+    let actual = [List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT(0, 1); Q.X 0]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT(0, 3); Q.X 0]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT(0, 4); Q.X 0]) (Q.init_qvm 6)) 1) 0;
+
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT(1, 3); Q.X 1]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT(3, 5); Q.X 3]) (Q.init_qvm 6)) 1) 0;
+                 ] in
+    let expected = [[1; 1; 0; 0; 0; 0];
+                    [1; 0; 0; 1; 0; 0];
+                    [1; 0; 0; 0; 1; 0];
+
+                    [0; 1; 0; 1; 0; 0];
+                    [0; 0; 0; 1; 0; 1]
+                   ] in
+    List.for_all2 (fun x y -> x = y) actual expected
+
+  let apply_reverse_cnot () =
+    let actual = [List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT(1, 0); Q.X 1]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT(3, 0); Q.X 3]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT(4, 0); Q.X 4]) (Q.init_qvm 6)) 1) 0;
+
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT(3, 1); Q.X 3]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT(5, 3); Q.X 5]) (Q.init_qvm 6)) 1) 0;
+                 ] in
+    let expected = [[1; 1; 0; 0; 0; 0];
+                    [1; 0; 0; 1; 0; 0];
+                    [1; 0; 0; 0; 1; 0];
+
+                    [0; 1; 0; 1; 0; 0];
+                    [0; 0; 0; 1; 0; 1]
+                   ] in
+    List.for_all2 (fun x y -> x = y) actual expected
+
+  let apply_reverse_cnot_2 () = Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT (3, 1); Q.X 3]) (Q.init_qvm 6)) 1 =
+                                [[0; 1; 0; 1; 0; 0]]
+
+  let apply_swap () =
+    let actual = [List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.SWAP(0, 1); Q.X 0]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.SWAP(0, 3); Q.X 0]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.SWAP(0, 4); Q.X 0]) (Q.init_qvm 6)) 1) 0;
+
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.SWAP(1, 3); Q.X 1]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.SWAP(3, 5); Q.X 3]) (Q.init_qvm 6)) 1) 0;
+                 ] in
+    let expected = [[0; 1; 0; 0; 0; 0];
+                    [0; 0; 0; 1; 0; 0];
+                    [0; 0; 0; 0; 1; 0];
+
+                    [0; 0; 0; 1; 0; 0];
+                    [0; 0; 0; 0; 0; 1]
+                   ] in
+    List.for_all2 (fun x y -> x = y) actual expected
+
+  let apply_reverse_swap () =
+    let actual = [List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.SWAP(1, 0); Q.X 0]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.SWAP(3, 0); Q.X 0]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.SWAP(4, 0); Q.X 0]) (Q.init_qvm 6)) 1) 0;
+
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.SWAP(3, 1); Q.X 1]) (Q.init_qvm 6)) 1) 0;
+                  List.nth (Q.measure_all (Q.apply (Q.CIRCUIT [Q.SWAP(5, 3); Q.X 3]) (Q.init_qvm 6)) 1) 0;
+                 ] in
+    let expected = [[0; 1; 0; 0; 0; 0];
+                    [0; 0; 0; 1; 0; 0];
+                    [0; 0; 0; 0; 1; 0];
+
+                    [0; 0; 0; 1; 0; 0];
+                    [0; 0; 0; 0; 0; 1]
+                   ] in
+    List.for_all2 (fun x y -> x = y) actual expected
+
   let apply_h () = Q.apply (Q.H 0) (Q.init_qvm 1) =
                      {Q.num_qubits = 1; wf = (V.of_array [|inv_sqrt_two; inv_sqrt_two|]) |> V.transpose; reg=[|0|] }
 
@@ -147,6 +218,21 @@ let swpgtr2 () =
 let get_2q_gt () =
   Alcotest.(check bool) "get_2q_gt" true (To_test.get_2q_gt ())
 
+let apply_cnot () =
+  Alcotest.(check bool) "apply_cnot" true (To_test.apply_cnot ())
+
+let apply_reverse_cnot () =
+  Alcotest.(check bool) "apply_reverse_cnot" true (To_test.apply_reverse_cnot ())
+
+let apply_reverse_cnot_2 () =
+  Alcotest.(check bool) "apply_reverse_cnot_2" true (To_test.apply_reverse_cnot_2 ())
+
+let apply_swap () =
+  Alcotest.(check bool) "apply_swap" true (To_test.apply_swap ())
+
+let apply_reverse_swap () =
+  Alcotest.(check bool) "apply_reverse_swap" true (To_test.apply_reverse_swap ())
+
 let apply_h () =
   Alcotest.(check bool) "apply_h" true (To_test.apply_h ())
 
@@ -198,6 +284,11 @@ let test_set = [
     "Dist-2 Swapagator", `Slow, swpgtr;
     "Dist-3 Swapagator", `Slow, swpgtr2;
     "Dist-2 CNOT gate", `Slow, get_2q_gt;
+    "Apply iterative CNOT 0 IDX", `Slow, apply_cnot;
+    "Apply CNOT 2 0", `Slow, apply_reverse_cnot;
+    "Apply CNOT 6 0", `Slow, apply_reverse_cnot_2;
+    "Apply iterative SWAP", `Slow, apply_swap;
+    "Apply reverse iterative SWAP", `Slow, apply_reverse_swap;
     "Apply Hadamard", `Slow, apply_h;
     "Apply Y", `Slow, apply_y;
     "Apply RX[PI/2]", `Slow, apply_rx_2;
