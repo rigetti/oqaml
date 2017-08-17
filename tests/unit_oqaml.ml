@@ -58,6 +58,12 @@ module To_test = struct
 
   let get_2q_gt () = U.get_2q_gate 3 0 2 P.cnot = M.dot (U.swapagator 0 2 3) (M.dot (U.kron_up [P.cnot; P.id]) (U.swapagator 0 2 3))
 
+  let apply_reverse_cnot () = Q.apply (Q.CIRCUIT [Q.CNOT (2, 0); Q.X 2]) (Q.init_qvm 3) =
+                                {Q.num_qubits = 3; wf = (V.unit_basis 8 5) |> V.transpose; reg=[|0; 0; 0|] }
+
+  let apply_reverse_cnot_2 () = Q.measure_all (Q.apply (Q.CIRCUIT [Q.CNOT (3, 1); Q.X 3]) (Q.init_qvm 6)) 1 =
+                                [[0; 1; 0; 1; 0; 0]]
+
   let apply_h () = Q.apply (Q.H 0) (Q.init_qvm 1) =
                      {Q.num_qubits = 1; wf = (V.of_array [|inv_sqrt_two; inv_sqrt_two|]) |> V.transpose; reg=[|0|] }
 
@@ -147,6 +153,12 @@ let swpgtr2 () =
 let get_2q_gt () =
   Alcotest.(check bool) "get_2q_gt" true (To_test.get_2q_gt ())
 
+let apply_reverse_cnot () =
+  Alcotest.(check bool) "apply_reverse_cnot" true (To_test.apply_reverse_cnot ())
+
+let apply_reverse_cnot_2 () =
+  Alcotest.(check bool) "apply_reverse_cnot_2" true (To_test.apply_reverse_cnot_2 ())
+
 let apply_h () =
   Alcotest.(check bool) "apply_h" true (To_test.apply_h ())
 
@@ -198,6 +210,8 @@ let test_set = [
     "Dist-2 Swapagator", `Slow, swpgtr;
     "Dist-3 Swapagator", `Slow, swpgtr2;
     "Dist-2 CNOT gate", `Slow, get_2q_gt;
+    "Apply CNOT 2 0", `Slow, apply_reverse_cnot;
+    "Apply CNOT 6 0", `Slow, apply_reverse_cnot_2;
     "Apply Hadamard", `Slow, apply_h;
     "Apply Y", `Slow, apply_y;
     "Apply RX[PI/2]", `Slow, apply_rx_2;
