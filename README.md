@@ -72,7 +72,7 @@ R7 (0, 1i)
 reg = [|0; 0; 0;|]}
 ```
 
-Note that the gates in the set `prog` are executed from right to left in the way quantum-mechanical notation acts on a state.
+Note that the gates in the set `prog` are executed from right to left in the way quantum-mechanical notation acts on a state. More details can be found in a small [walkthrough](./readmes/walkthrough.md)
 
 ## Building the docs
 To build the API docs you can run
@@ -83,6 +83,12 @@ make docs
 ```
 
 This will create a subfolder containing an HTML project that exposes all public APIs of OQaml.
+
+```bash
+make readmes
+```
+
+will compile the `tex` markdown files.
 
 ## Development and Testing
 The test infrastructure uses [Alcotest](https://github.com/mirage/alcotest). To run the tests you can execute

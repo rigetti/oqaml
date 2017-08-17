@@ -42,6 +42,14 @@ We can then use it as follows
 
 ```ocaml
 Q.apply (Q.CIRCUIT [pg 0; Q.X 0]) (Q.init_qvm 1);;
+
+>>> {Q.num_qubits = 1;
+wf = 
+        C0
+R0 (0, 0i)
+R1 (0, 1i);
+
+reg = [|0|]}
 ```
 
 Note how the above lines correspond to the Kitaev notation, i.e. the operations flow from right to left on the initial state.
@@ -58,7 +66,7 @@ let tqvm = Q.apply (Q.CIRCUIT [Q.H 2; Q.CNOT (0,1); Q.H 0]) (Q.init_qvm 3);;
 
 Measuring Qubit 2 
 ```ocaml
-let_cqvm = Q.apply (Q.MEASURE 2) tqvm;;
+let cqvm = Q.apply (Q.MEASURE 2) tqvm;;
 
 >>> {Q.num_qubits = 3;
 wf = 

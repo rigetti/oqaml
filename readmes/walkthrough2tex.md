@@ -48,6 +48,14 @@ We can then use it as follows
 
 ```ocaml
 Q.apply (Q.CIRCUIT [pg 0; Q.X 0]) (Q.init_qvm 1);;
+
+>>> {Q.num_qubits = 1;
+wf = 
+        C0
+R0 (0, 0i)
+R1 (0, 1i);
+
+reg = [|0|]}
 ```
 
 Note how the above lines correspond to the Kitaev notation, i.e. the operations flow from right to left on the initial state.
