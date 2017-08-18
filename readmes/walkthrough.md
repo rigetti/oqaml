@@ -6,9 +6,7 @@ OQaml represent the quantum states in the standard textbook ordering of the comp
 
 <p align="center"><img src="svgs/eae4a169bf644f525c0dcca105efe860.svg?invert_in_darkmode" align=middle width=322.46115pt height=16.438356pt/></p>
 
-The individual qubit space is denoted by <img src="svgs/f2662eb06c89703c22cbe91038838e1c.svg?invert_in_darkmode" align=middle width=107.132025pt height=24.6576pt/>. The full quantum state of a QVM with <img src="svgs/55a049b8f161ae7cfeb0197d75aff967.svg?invert_in_darkmode" align=middle width=9.867pt height=14.15535pt/> qubits can then be represented by a vector of size <img src="svgs/f8f25e4580c418a51dc556db0d8d2b93.svg?invert_in_darkmode" align=middle width=16.34523pt height=21.8394pt/> whose entries are complex numbers. The amplitude of a given computational bais state is then given by the entry in the state-vector corresponding to the integer of the bit-string representation. E.g. the state <img src="svgs/e066fcf03f881090e3a1335e26353c45.svg?invert_in_darkmode" align=middle width=33.06072pt height=24.6576pt/> corresponds to the third entry in the four-dimensional wave-function vector containing the complex unit <img src="svgs/77a3b857d53fb44e33b53e4c8b68351a.svg?invert_in_darkmode" align=middle width=5.663295pt height=21.68331pt/>.
-
-To create the above state in OQaml you can run the following commands in `utop`
+The individual qubit space is denoted by <img src="svgs/f2662eb06c89703c22cbe91038838e1c.svg?invert_in_darkmode" align=middle width=107.132025pt height=24.6576pt/>. The full quantum state of a QVM with <img src="svgs/55a049b8f161ae7cfeb0197d75aff967.svg?invert_in_darkmode" align=middle width=9.867pt height=14.15535pt/> qubits can then be represented by a vector of size <img src="svgs/f8f25e4580c418a51dc556db0d8d2b93.svg?invert_in_darkmode" align=middle width=16.34523pt height=21.8394pt/> whose entries are complex numbers. The amplitude of a given computational bais state is then given by the entry in the state-vector corresponding to the integer of the bit-string representation. E.g. the state <img src="svgs/e066fcf03f881090e3a1335e26353c45.svg?invert_in_darkmode" align=middle width=33.06072pt height=24.6576pt/> corresponds to the third entry in the four-dimensional wave-function vector containing the complex unit <img src="svgs/77a3b857d53fb44e33b53e4c8b68351a.svg?invert_in_darkmode" align=middle width=5.663295pt height=21.68331pt/>. To create this state in OQaml you can run the following commands in `utop`
 
 ```ocaml
 #require "oqaml, owl";;
@@ -32,7 +30,13 @@ The application of gates <img src="svgs/6bac6ec50c01592407695ef84f457232.svg?inv
 
 <p align="center"><img src="svgs/66d271e8d7ba31fb430a85027ecf2fbf.svg?invert_in_darkmode" align=middle width=96.416925pt height=17.03196pt/></p>
 
-The gates <img src="svgs/6bac6ec50c01592407695ef84f457232.svg?invert_in_darkmode" align=middle width=13.016025pt height=22.46574pt/> are represented by matrices. Note that the gates are not necessarily unitary as they also incorporate classical gates and projections (corresponding to measurments). A circuit is described as a composition of gates and in Kitaev ordering (time from right to left) reads as
+In OQaml this transition operation is deeply engrained into the syntax as seen by the type definition of the `apply` function, which maps a `gate` to a `qvm` returning a `qvm`
+
+```ocaml
+val apply: gate -> qvm -> qvm
+```
+
+The gates <img src="svgs/6bac6ec50c01592407695ef84f457232.svg?invert_in_darkmode" align=middle width=13.016025pt height=22.46574pt/> are represented by matrices. Note that in general gates are not unitary as they also incorporate classical gates and projections (corresponding to measurements). A circuit is described as a composition of gates and in Kitaev ordering (time from right to left) reads as
 
 <p align="center"><img src="svgs/ee24cfd2696b482b73aa1a593306dcfc.svg?invert_in_darkmode" align=middle width=183.8265pt height=17.03196pt/></p>
 
@@ -40,7 +44,16 @@ Note the operator ordering in the above expression corresponding to the Kitaev n
 
 <p align="center"><img src="svgs/b4585711718e126580216be235f852cc.svg?invert_in_darkmode" align=middle width=134.445795pt height=15.0684765pt/></p>
 
-which highlights the fact that circuits and gates are conceptually the same mathematical type. OQaml makes use of this fact by defining gates as a *recursive type*. This lets you define a gate as a simple circuit.
+which highlights the fact that circuits and gates are conceptually the same mathematical type. OQaml makes use of this fact by defining gates as a *recursive type* as seen in the `gate` type definition
+
+```ocaml
+type gate =
+  | ...
+  | CIRCUIT of gate list
+  |...
+```
+
+This abstraction lets you define arbitraty gate as a circuit, ensuring that the application of this gate in extended circuits is a valid operation as any `gate` type can be used in the `apply` function defined above.
 
 ### Example - Phase gate
 
@@ -99,17 +112,19 @@ Q.apply (swap 0 1) tqvm = Q.apply (Q.SWAP (0,1)) tqvm;;
 ```
 
 
-## Entanglement and Measurment
+## Entanglement and Measurement
 
-OQaml highlights the fact that a measurment is a gate operation, though it is non-unitary. In general a measurment is connected to the (partial) collapse of a wave-function. It will factorize the wave-function w.r.t. to the qubits that have been measured. To understand what is happening let us construct a circuit to create the state
+OQaml highlights the fact that a measurement is a gate operation, despite it being non-unitary. In general a measurement is connected to the (partial) collapse of a wave-function. It will factorize the wave-function with respect to the measured qubits. To understand what is happening let us construct a circuit to create the state
 
 <p align="center"><img src="svgs/5efd49e23c03e3611f5c570d73206c99.svg?invert_in_darkmode" align=middle width=204.567pt height=16.438356pt/></p>
+
+We can do this with a simple circuit
 
 ```ocaml
 let tqvm = Q.apply (Q.CIRCUIT [Q.H 2; Q.CNOT (0,1); Q.H 0]) (Q.init_qvm 3);;
 ```
 
-Measuring Qubit 2
+Measuring Qubit 2 with the `MEASURE` gate
 ```ocaml
 let cqvm = Q.apply (Q.MEASURE 2) tqvm;;
 
@@ -127,15 +142,15 @@ R7 (0.707107, 0i);
 
 reg = [|0; 0; 1|]}
 ```
-then collapses the state either
+then collapses the state to either
 <p align="center"><img src="svgs/3d5a1e6c7d2ebefc7bbf8c9210b22233.svg?invert_in_darkmode" align=middle width=158.972715pt height=16.438356pt/></p>
 or
 <p align="center"><img src="svgs/68c164a747b4d059a9b9a5d0cc78e912.svg?invert_in_darkmode" align=middle width=158.972715pt height=16.438356pt/></p>
-leaving an entangled bell pair behind. On the other hand measureing Qubit 0 destroys the entanglement and results in
+leaving an entangled bell pair behind. On the other hand measuring Qubit 0 destroys the entanglement and results in
 <p align="center"><img src="svgs/b2d182b77b130a9c3e32f91f35f837d9.svg?invert_in_darkmode" align=middle width=150.753405pt height=19.24329pt/></p>
 or
 <p align="center"><img src="svgs/33a3b073ff70009a0611eabd0915eac2.svg?invert_in_darkmode" align=middle width=150.753405pt height=19.24329pt/></p>
-Note that the measurement gives us back a valid QVM, with the classic register being filled with the corresponding measurement outcome. Both of these tests can be confirmed using the `measure_all` functionality that let's you sample from a prepared QVM state.
+Note that the measurement returns a valid QVM, with the classic register being filled with the corresponding measurement outcome. The validity is guaranteed by the type definition of `MEASURE` and the type signature of the `apply` function. Both of the measurement tests described above can be confirmed using the `measure_all` functionality that let's you sample from a prepared QVM state:
 
 ```ocaml
 Q.measure_all cvqm 10;;
@@ -143,3 +158,5 @@ Q.measure_all cvqm 10;;
 >>> [[0; 0; 1]; [1; 1; 1]; [1; 1; 1]; [1; 1; 1]; [0; 0; 1];
      [1; 1; 1]; [1; 1; 1]; [1; 1; 1]; [0; 0; 1]; [0; 0; 1]]
 ```
+
+In this example we prepared the QVM in the `cqvm` state above and asked the system to sample 10 individual bitstrings from `cqvm`. This enables you to now do statistical analysis on these strings and infer information about the quantum system.
