@@ -82,13 +82,13 @@ make oasis
 make docs
 ```
 
-This will create a subfolder containing an HTML project that exposes all public APIs of OQaml.
+This will create a subfolder containing an HTML project that exposes all public APIs of OQaml. To create the readme files and images you need the most recent development version of [readme2tex](https://github.com/leegao/readme2tex); Compilation is done with
 
 ```bash
 make readmes
 ```
 
-will compile the `tex` markdown files.
+will convert the `tex` markdown files to well readable markdown.
 
 ## Development and Testing
 The test infrastructure uses [Alcotest](https://github.com/mirage/alcotest). To run the tests you can execute
