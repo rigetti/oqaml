@@ -17,3 +17,9 @@ uninstall:
 	ocamlfind remove oqaml
 docs:
 	ocaml setup.ml -doc
+.PHONY: readmes
+readmes:
+	python -m readme2tex --project OQaml --username oqaml --output walkthrough.md readmes/walkthrough2tex.md --nocdn
+	rm -r readmes/svgs
+	mv svgs readmes/
+	mv walkthrough.md readmes/
