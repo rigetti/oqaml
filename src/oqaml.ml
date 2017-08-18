@@ -6,7 +6,6 @@ include Utils
 module A = Array
 open Primitives
 
-(** QVM supporting ProtoQuil *)
 type gate =
   | I of int
   | X of int
@@ -64,6 +63,7 @@ let measure qvm idx =
 
 let rec apply i qvm =
   match i with
+  (* Unitary quantum gates *)
   | I(x) -> {num_qubits = qvm.num_qubits;
              wf = V.dot (get_1q_gate qvm.num_qubits x id) qvm.wf;
              reg = qvm.reg}
@@ -80,8 +80,8 @@ let rec apply i qvm =
              wf = V.dot (get_1q_gate qvm.num_qubits x h) qvm.wf;
              reg = qvm.reg}
   | PHASE(t) -> {num_qubits = qvm.num_qubits;
-                   wf = V.mul_scalar qvm.wf (C.polar 1. t);
-                   reg = qvm.reg}
+                 wf = V.mul_scalar qvm.wf (C.polar 1. t);
+                 reg = qvm.reg}
   | RX(t,x) -> {num_qubits = qvm.num_qubits;
                 wf = V.dot (get_1q_gate qvm.num_qubits x (rx t)) qvm.wf;
                 reg = qvm.reg}
@@ -97,9 +97,12 @@ let rec apply i qvm =
   | SWAP(x,y) -> {num_qubits = qvm.num_qubits;
                   wf = V.dot (get_2q_gate qvm.num_qubits x y swap) qvm.wf;
                   reg = qvm.reg}
+  (* Recursive CIRCUIT variant *)
   | CIRCUIT(hd :: tl) -> apply hd (apply (CIRCUIT (tl)) qvm)
   | CIRCUIT([]) -> qvm;
+  (* Non-Unitary quantum gates *)
   | MEASURE(x) -> measure qvm x;
+  (* Classic boolean gates *)
   | NOT(x) -> {num_qubits = qvm.num_qubits;
                wf = qvm.wf;
                reg = flip x (A.copy qvm.reg)};
@@ -121,7 +124,7 @@ let measure_all qvm n =
   let module S = Core_extended.Sampler in
   let state_list qvm =
     let r = range 0 (int_pow 2 qvm.num_qubits) in
-    List.map (fun x -> (pad_list qvm.num_qubits (binary_rep x)) |> List.rev) r in
+    List.map (fun x -> pad_list qvm.num_qubits (binary_rep x) |> List.rev) r in
   let smplr = S.create (List.map2 (fun x y -> (x, y))
                                   (state_list qvm)
                                   (get_probs qvm)) in

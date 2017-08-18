@@ -17,15 +17,17 @@ val pad_list : int -> int list -> int list
 (** creates a range of integers *)
 val range : int -> int -> int list
 
-(** builds a list of length [int] which at position [int] contains
-    matrix [M.mat] *)
+(** builds a list of identity gates for [int] qubits which at position [int]
+    contains matrix [M.mat] for a one-qubit gate. This can be used to kron_up
+    the fully lifted gate matrix *)
 val build_gate_list : int -> int -> M.mat -> M.mat list
 
-(** builds a list of length [int] which at position [int] contains
-    matrix [M.mat] for a two-qubit gate *)
+(** builds a list of identity gates for [int] qubits which at position [int]
+    contains matrix [M.mat] for a two-qubit gate. This can be used to kron_up
+    the fully lifted gate matrix  *)
 val build_gate_list_with_2q_gate : int -> int -> M.mat -> M.mat list
 
-(** constructs the full swap-matrix for move the qubits [int] and [int]
+(** constructs the full lifted swap-matrix for move the qubits [int] and [int]
     in a qvm with [int] qubits next to each other *)
 val swapagator : int -> int -> int -> M.mat
 
