@@ -55,7 +55,6 @@ We can decompose any single qubit gate <img src="svgs/6bac6ec50c01592407695ef84f
 and with a bit of algebra we find that to decompose <img src="svgs/e257acd1ccbe7fcb654708f1a866bfe9.svg?invert_in_darkmode" align=middle width=11.027445pt height=22.46574pt/> we have <img src="svgs/edad3500d9f7368f82c110d98051b30b.svg?invert_in_darkmode" align=middle width=39.56073pt height=21.18732pt/> and <img src="svgs/cff54eb79a3dbe3fa7e283c25b807932.svg?invert_in_darkmode" align=middle width=120.82158pt height=24.6576pt/>. In OQaml we can now define a gate according to
 
 ```ocaml
-module Q = Oqaml;;
 let pi4 = Owl.Maths.pi_4;;
 let pg idx = Q.CIRCUIT [Q.PHASE (pi4); Q.RZ(pi4, idx); Q.RY (0.0, idx); Q.RZ (pi4, idx)];;
 
@@ -63,9 +62,9 @@ let pg idx = Q.CIRCUIT [Q.PHASE (pi4); Q.RZ(pi4, idx); Q.RY (0.0, idx); Q.RZ (pi
 ```
 There are two things worthwhile to point out:
  1. note how the above code snippet mimicks the Kitaev ordering of the corresponding Gate/Circuit definition.
- 2. the type of `pg` is `int -> Q.gate` meaning it maps an integer index to a gate, just as we discussed above indicating the recursive nature of a gate type
+ 2. the type of `pg` is `int -> Q.gate` meaning it maps an integer index to a gate, indicating the recursive nature of a gate type, as discussed above.
 
-We can use the newly definded gat as follows
+The newly definded gate can now be used as follows
 
 ```ocaml
 Q.apply (Q.CIRCUIT [pg 0; Q.X 0]) (Q.init_qvm 1);;

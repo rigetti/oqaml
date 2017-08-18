@@ -63,7 +63,6 @@ $$
 and with a bit of algebra we find that to decompose $S$ we have $\gamma = 0$ and $\alpha = \beta=\delta = \pi/4$. In OQaml we can now define a gate according to
 
 ```ocaml
-module Q = Oqaml;;
 let pi4 = Owl.Maths.pi_4;;
 let pg idx = Q.CIRCUIT [Q.PHASE (pi4); Q.RZ(pi4, idx); Q.RY (0.0, idx); Q.RZ (pi4, idx)];;
 
@@ -71,9 +70,9 @@ let pg idx = Q.CIRCUIT [Q.PHASE (pi4); Q.RZ(pi4, idx); Q.RY (0.0, idx); Q.RZ (pi
 ```
 There are two things worthwhile to point out:
  1. note how the above code snippet mimicks the Kitaev ordering of the corresponding Gate/Circuit definition.
- 2. the type of `pg` is `int -> Q.gate` meaning it maps an integer index to a gate, just as we discussed above indicating the recursive nature of a gate type
+ 2. the type of `pg` is `int -> Q.gate` meaning it maps an integer index to a gate, indicating the recursive nature of a gate type, as discussed above.
 
-We can use the newly definded gat as follows
+The newly definded gate can now be used as follows
 
 ```ocaml
 Q.apply (Q.CIRCUIT [pg 0; Q.X 0]) (Q.init_qvm 1);;
