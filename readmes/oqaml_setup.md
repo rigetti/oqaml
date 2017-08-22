@@ -33,7 +33,7 @@ This guide is intended to give you a general idea of how to get started with OCa
     ```bash
     opam config env
     ```
-There will be several ENV variables displayed. Make sure to put them into your `.bashrc` and source it. You are now all set up in the right OCaml environment. To get install OQaml we need to install some more dependencies and OCaml packages.
+There will be several ENV variables displayed. Make sure to put them into your `.bashrc` and source it. Run `ocaml --version` and confirm that is displays `The OCaml toplevel, version 4.04.2`. You are now all set up in the right OCaml environment. To get install OQaml we need to install some more dependencies and OCaml packages.
 
 5. Setting up [oasis](http://oasis.forge.ocamlcore.org/);an OCaml build system manager:
 
