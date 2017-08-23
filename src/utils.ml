@@ -22,25 +22,25 @@ let int_pow base exp = (float_of_int base) ** (float_of_int exp) |> int_of_float
 
 let rec binary_rep x =
   let rem = x mod 2 in
-  if x > 0 then rem :: (binary_rep (x / 2))
+  if x > 0 then rem :: binary_rep (x / 2)
   else []
 
 let rec pad_list n l =
   let pl = l@[0] in
-  if List.length(pl) <= n then pad_list n pl
+  if List.length pl <= n then pad_list n pl
   else l
 
 let rec range i j =
-  if i < j then i :: (range (i + 1) j)
+  if i < j then i :: range (i + 1) j
   else []
 
 let build_gate_list n q g =
   let rec _build_list i n q g =
     let x = i + 1 in
-    if (i != q) && (i < n) then
-      id :: (_build_list x n q g)
-    else if (i == q) && (i < n) then
-      g :: (_build_list x n q g)
+    if i <> q && i < n then
+      id :: _build_list x n q g
+    else if i = q && i < n then
+      g :: _build_list x n q g
     else [] in
   _build_list 0 n q g
 
@@ -48,15 +48,15 @@ let build_gate_list_with_2q_gate n ql g =
   let rec _build_nn_2q_gate_list i n ql g =
     let x = i + 1 in
     if ql < n - 1 then
-      if (i != ql) && (i < n) then
-        id :: (_build_nn_2q_gate_list x n ql g)
-      else if (i == ql) && (i < n - 1) then
-        g :: (_build_nn_2q_gate_list (x + 1) n ql g)
+      if i <> ql && i < n then
+        id :: _build_nn_2q_gate_list x n ql g
+      else if i = ql && i < n - 1 then
+        g :: _build_nn_2q_gate_list (x + 1) n ql g
       else []
     else
-      if (i != n - 2) && (i < n - 1) then
-        id :: (_build_nn_2q_gate_list x n ql g)
-      else if (i == n -2 ) && (i < n) then
+      if i <> n - 2 && i < n - 1 then
+        id :: _build_nn_2q_gate_list x n ql g
+      else if (i = n - 2 ) && (i < n) then
         g :: []
       else [] in
   _build_nn_2q_gate_list 0 n ql g
@@ -114,16 +114,16 @@ let flip x arr =
   arr
 
 let cand x y arr =
-  let bit_and ctr tar = if (ctr == 1 && tar == 1) then 1 else 0 in
+  let bit_and ctr tar = if ctr = 1 && tar = 1 then 1 else 0 in
   arr.(y) <-  bit_and arr.(x) arr.(y);
   arr
 
 let cor x y arr =
-  let bit_or ctr tar = if (ctr == 0 && tar == 0) then 0 else 1 in
+  let bit_or ctr tar = if ctr = 0 && tar = 0 then 0 else 1 in
   arr.(y) <- bit_or arr.(x) arr.(y);
   arr
 
 let xor x y arr =
-  let bit_xor ctr tar = if (ctr == tar) then 0 else 1 in
+  let bit_xor ctr tar = if ctr = tar then 0 else 1 in
   arr.(y) <- bit_xor arr.(x) arr.(y);
   arr
