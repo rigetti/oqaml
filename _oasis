@@ -1,3 +1,4 @@
+# -*- conf -*-
 # Copyright 2017 Rigetti Computing, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,6 +46,8 @@ Library oqaml
   BuildTools:       ocamlbuild, ocamldoc
   Modules:          Oqaml,
                     Primitives
+  NativeOpt:        -g -w +a-4-40..42-44-45-48
+  ByteOpt:          -g -w +a-4-40..42-44-45-48
   InternalModules:  Utils
   BuildDepends:     owl,
                     core_extended
