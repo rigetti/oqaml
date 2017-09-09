@@ -1,3 +1,5 @@
+[![Build Status](https://semaphoreci.com/api/v1/rigetti/oqaml/branches/master/badge.svg)](https://semaphoreci.com/rigetti/oqaml)
+
 # OQaml
 
 OQaml is licensed under the Apache 2.0 license.
