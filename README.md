@@ -21,7 +21,7 @@ OQaml actively uses [Owl](https://github.com/ryanrhymes/owl) and JaneStreet's [C
 If you have already have a working OCaml environment you can install OQaml by cloning this repository and run.
 
 ```bash
-make oasis
+make all
 make install
 ```
 from the repository root. This will install OQaml into your OCaml environment.
@@ -83,7 +83,6 @@ More details can be found in the small getting started [walkthrough](./readmes/w
 To build the API docs you can run
 
 ```bash
-make oasis
 make docs
 ```
 
@@ -100,7 +99,7 @@ The test infrastructure uses [Alcotest](https://github.com/mirage/alcotest). To 
 
 ```bash
 opam install alcotest
-make oasis-test
+make test
 ```
 
 

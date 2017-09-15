@@ -1,0 +1,8 @@
+(jbuild_version 1)
+
+(library
+ ((name oqaml)
+  (public_name oqaml)
+  (wrapped false)
+  (flags (:standard))
+  (libraries (owl core_extended))))

@@ -35,13 +35,13 @@ This guide is intended to give you a general idea of how to get started with OCa
     ```
 There will be several ENV variables displayed. Make sure to put them into your `.bashrc` and source it. Run `ocaml --version` and confirm that is displays `The OCaml toplevel, version 4.04.2`. You are now all set up in the right OCaml environment. To get install OQaml we need to install some more dependencies and OCaml packages.
 
-5. Setting up [oasis](http://oasis.forge.ocamlcore.org/);an OCaml build system manager:
+5. Setting up jbuilder; an OCaml build system manager:
 
     ```bash
-    opam install oasis
+    opam install jbuilder
     ```
 
-    Depending on your distribution of Linux od MacOS there might be OS dependencies missing. Opam is giving you good guidelines to check for those dependencies and help you install missing ones. E.g. for a missing `conf-m4.1` dependency opam suggests to run
+    Depending on your distribution of Linux or MacOS there might be OS dependencies missing. Opam is giving you good guidelines to check for those dependencies and help you install missing ones. E.g. for a missing `conf-m4.1` dependency opam suggests to run
 
     ```bash
     opam depext conf-m4.1
@@ -68,12 +68,12 @@ There will be several ENV variables displayed. Make sure to put them into your `
     2. `cd owl`
     2. ensure `openblas` and `lapacke` are installed on your OS.
     3. `opam install ctypes dolog eigen gsl oasis plplot atdgen`. In this process there might be more OS dependencies you have to install. Simply let opam help you to figure out which OS libraries are missing with a couple of `opam depext <X>`.
-    4. `make oasis`
-    5. `make && make install`
+    4. `make all`
+    5. `make install`
 
 
 3. You are now ready to install OQaml. To this end move into the OQaml directory and run
 
     ```bash
-    make oasis && make install
+    make all && make install
     ```

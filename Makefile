@@ -12,26 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-oasis:
-	oasis setup
-	ocaml setup.ml -configure
-oasis-test:
-	oasis setup
-	ocaml setup.ml -configure --enable-tests
-	ocaml setup.ml -build -tag thread
-	ocaml setup.ml -test
+.PHONY: readmes all test docs clean
+test:
+	jbuilder runtest -j1 --no-buffer
 all:
-# https://stackoverflow.com/questions/16552834/how-to-use-thread-compiler-flag-with-ocamlbuild
-	ocaml setup.ml -build -tag thread
+	jbuilder build @install
 install:
-	ocaml setup.ml -build -tag thread
-	ocaml setup.ml -uninstall
-	ocaml setup.ml -install
+	jbuilder install
 uninstall:
-	ocamlfind remove oqaml
+	jbuilder uninstall
 docs:
-	ocaml setup.ml -doc
-.PHONY: readmes
+	jbuilder build @doc
+clean:
+	jbuilder clean
+cleanall:
+	jbuilder uninstall && jbuilder clean
+	rm -rf `find . -name .merlin`
 readmes:
 	python -m readme2tex --project OQaml --username oqaml --output walkthrough.md readmes/walkthrough2tex.md --nocdn --pngtrick
 	rm -r readmes/svgs
