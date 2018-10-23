@@ -1,4 +1,6 @@
-[![Build Status](https://semaphoreci.com/api/v1/rigetti/oqaml/branches/master/badge.svg)](https://semaphoreci.com/rigetti/oqaml)
+>Notice: This is research code that will not necessarily be maintained to support further
+>releases of Forest and other Rigetti Software. We welcome bug reports and PRs
+>but make no guarantee about fixes or responses.
 
 # OQaml
 
